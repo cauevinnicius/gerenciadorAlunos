@@ -108,6 +108,7 @@ public class Menu
             Console.WriteLine($"Nome do Aluno: {nomeAluno}\nCPF: {cpfFormatado}\nE-mail: {emailAluno}\nCelular: {celularAluno}\n\n");
             Console.Write("Prosseguir com o cadastramento? (S/N): ");
             string resposta = Console.ReadKey().KeyChar.ToString().ToUpper().Trim(); // Aplicada a ideia sugerida pelo Sergio: Console.ReadKey. Tive que passar pra um .ToString se não estava dando erro. Ideia de prevenção de sempre passar para maiuscula e retirar espaços
+            Console.ReadLine(); // estava cadastrando direto, sem mostrar nenhuma mensagem.
             if (resposta == "S")
             {
                 _aluno.Cadastrar(nomeAluno, cpfFormatado, emailAluno, celularAluno);
@@ -124,7 +125,7 @@ public class Menu
             }
             else
             {
-                Console.WriteLine("Hmm... parece que essa opção é inválida! Por gentileza, digite SIM ou NAO");
+                Console.WriteLine("Hmm... parece que essa opção é inválida! Por gentileza, digite S ou N");
             }
 
         }
@@ -175,11 +176,10 @@ public class Menu
     {
         Console.Clear();
         Console.WriteLine("=== Edição de Cadastros de Alunos(as) ===\n");
-        //Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: "); // retirei pq já está vindo na minha _aluno.Selecionar.
+        Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: ");
         string termoBusca = Console.ReadLine(); // nessa daqui, diferente da BuscarAluno, quis criar uma variável pra guardar o que o usuário digitou.
 
         List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca); // aqui. Na Buscar eu coloquei o Console.ReadLine direto. Ver com o Sérgio é melhor (acredito q essa aqui)
-                                                                       // pra nao precisaar refazer tudo, usei a função do selecionar
 
         if (alunosEncontrados.Count == 0) // validacao
         {
@@ -257,12 +257,11 @@ public class Menu
     {
         Console.Clear();
         Console.WriteLine("=== Edição de Cadastros de Alunos(as) ===\n");
-        //Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: "); retirei pq já esta vindo na minha _aluno.Selecionar.
+        Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: "); 
         string termoBusca = Console.ReadLine(); // nessa daqui, diferente da BuscarAluno, quis criar uma variável pra guardar o que o usuário digitou.
 
-        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca); // aqui. Na Buscar eu coloquei o Console.ReadLine direto. Ver com o Sérgio é melhor (acredito q essa aqui)
-                                                                       // pra nao precisaar refazer tudo, usei a função do selecionar
-
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca); 
+       
         if (alunosEncontrados.Count == 0) // validacao
         {
             Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
@@ -430,8 +429,7 @@ public class Menu
         }
 
         Console.WriteLine($"Aluno(a): {alunoAtual.Nome}");
-        // aqui seria a melhoria de mostrar na tela todas as mensalidades (uma lista) do aluno e poder verificar com precisão o que está pendente.
-        List<Mensalidade> faturas = _mensalidade.ListarMensalidades(alunoAtual.Id);
+        List<Mensalidade> faturas = _mensalidade.ListarMensalidades();
 
         if (faturas.Count == 0)
         {
@@ -479,72 +477,28 @@ public class Menu
     private void ListarMensalidades()
     {
         Console.Clear();
-        Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
-        Console.WriteLine("Por gentileza, digite o ID ou o nome do(a) aluno(a)");
-        string termoBusca = Console.ReadLine();
-
-        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
-
-        if (alunosEncontrados.Count == 0)
-        {
-            Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
-            Console.ReadLine();
-            return;
-        }
-
-        Aluno alunoAtual = null;
-
-        if (alunosEncontrados.Count == 1)
-        {
-            alunoAtual = alunosEncontrados[0];
-        }
-        else
-        {
-            Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
-            foreach (Aluno a in alunosEncontrados)
-            {
-                Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
-            }
-
-            Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja lançar a mensalidade: ");
-            if (int.TryParse(Console.ReadLine(), out int idDigitado))
-            {
-                foreach (Aluno a in alunosEncontrados)
-                {
-                    if (a.Id == idDigitado)
-                    {
-                        alunoAtual = a;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (alunoAtual == null)
-        {
-            Console.WriteLine("\nHmm.. parece que esse ID é inválido! Tente novamente.");
-            Console.ReadLine();
-            return;
-        }
-
-        Console.WriteLine($"Aluno(a): {alunoAtual.Nome}");
-        List<Mensalidade> faturas = _mensalidade.ListarMensalidades(alunoAtual.Id);
+        Console.WriteLine("=== Listagem de Mensalidades ===\n");
+        
+        List<Mensalidade> faturas = _mensalidade.ListarMensalidades();
 
         if (faturas.Count == 0)
         {
-            Console.WriteLine("Este(a) aluno(a) não possui nenhuma mensalidade lançada.");
+            Console.WriteLine("Hmm.. parece que não há nenhuma mensalidade cadastrada!");
             Console.ReadLine();
             return;
-        } // será q eu nao deveria ter posto um else aqui e o foreach dentro do else?
+        }
         foreach (var m in faturas)
         {
             Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}");
         }
+
+        Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu Principal");
+        Console.ReadLine();
     }
     private void VerificaPendencias()
     {
         Console.Clear();
-        Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
+        Console.WriteLine("=== Verificação de Pendências ===");
         Console.WriteLine("Por gentileza, digite o ID ou o nome do(a) aluno(a)");
         string termoBusca = Console.ReadLine();
 
@@ -592,7 +546,7 @@ public class Menu
             return;
         }
 
-        Console.WriteLine($"Hmm.. encontramos algumas pendências do(a) aluno(a): {alunoAtual.Nome}\n");
+        Console.WriteLine($"Nome do(a) aluno(a): {alunoAtual.Nome}\n");
         List<Mensalidade> pendencias = _mensalidade.VerificaPendencias(alunoAtual.Id);
 
         if (pendencias.Count == 0)
@@ -601,6 +555,7 @@ public class Menu
         }
         else
         {
+            Console.WriteLine("Hmm.. encontramos as seguintes pendências\n");
             foreach (var m in pendencias)
             {
                 Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}");
@@ -613,7 +568,7 @@ public class Menu
     private void EditarMensalidade()
     {
         Console.Clear();
-        Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
+        Console.WriteLine("=== Edição de Mensalidades ===");
         Console.WriteLine("Por gentileza, digite o ID ou o nome do(a) aluno(a)");
         string termoBusca = Console.ReadLine();
 
@@ -661,11 +616,11 @@ public class Menu
             return;
         }
 
-        List<Mensalidade> faturas = _mensalidade.ListarMensalidades(alunoAtual.Id);
+        List<Mensalidade> faturas = _mensalidade.ListarMensalidades();
 
         if (faturas.Count == 0)
         {
-            Console.WriteLine("\nEste aluno não possui nenhuma mensalidade lançada.");
+            Console.WriteLine("\nHmm.. parece que ainda não há mensalidades cadastradas!");
             Console.ReadLine();
             return;
         }
@@ -727,7 +682,8 @@ public class Menu
             novoStatus = faturaAtual.Status;
         }
 
-        DateTime? novaDataPagamento = faturaAtual.DataPagamento != DateTime.MinValue ? faturaAtual.DataPagamento : (DateTime?)null;
+        // Revisao para futura melhoria.
+        /*DateTime? novaDataPagamento = faturaAtual.DataPagamento != DateTime.MinValue ? faturaAtual.DataPagamento : (DateTime?)null;
         if (faturaAtual.DataPagamento != DateTime.MinValue)
         {
             Console.WriteLine($"Data de pagamento atual: {faturaAtual.DataPagamento.ToShortDateString()}");
@@ -739,9 +695,9 @@ public class Menu
                     novaDataPagamento = novaData;
                 }
             }
-        }
+        }*/
 
-        bool sucesso = _mensalidade.EditarMensalidade(novoValor, novoVencimento, novoStatus, novaDataPagamento, faturaAtual.Id);
+        bool sucesso = _mensalidade.EditarMensalidade(novoValor, novoVencimento, novoStatus, faturaAtual.Id);
 
         if (sucesso)
         {

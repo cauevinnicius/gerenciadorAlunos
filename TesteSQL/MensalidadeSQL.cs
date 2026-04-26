@@ -58,16 +58,14 @@ class MensalidadeSQL
         }
     }
 
-    public List<Mensalidade> ListarMensalidades(int aluno_id)
+    public List<Mensalidade> ListarMensalidades()
     {
         List<Mensalidade> listaMensalidades = new List<Mensalidade>();
-        string sql = "SELECT * FROM mensalidades WHERE aluno_id = @aluno_id";
+        string sql = "SELECT * FROM mensalidades";
 
         using (var conexao = new MySqlConnection(_stringDeConexao))
         using (var comando = new MySqlCommand(sql, conexao))
         {
-            comando.Parameters.AddWithValue("@aluno_id", aluno_id);
-
             try
             {
                 conexao.Open();
@@ -139,7 +137,7 @@ class MensalidadeSQL
         return listaMensalidades;
     }
 
-    public bool EditarMensalidade(decimal valor, DateTime dataVencimento, string status, DateTime? dataPagamento, int id) // nem sempre teremos uma nova data de pagamento
+    public bool EditarMensalidade(decimal valor, DateTime dataVencimento, string status, int id) // nem sempre teremos uma nova data de pagamento
     {
         string sql = "UPDATE mensalidades SET valor = @valor, data_vencimento = @data_vencimento, status = @status, data_pagamento = @data_pagamento WHERE id = @id";
 
@@ -150,10 +148,10 @@ class MensalidadeSQL
             comando.Parameters.AddWithValue("@valor", valor);
             comando.Parameters.AddWithValue("@data_vencimento", dataVencimento);
             comando.Parameters.AddWithValue("@status", status);
-            comando.Parameters.AddWithValue("@data_pagamento", dataPagamento);
+            //comando.Parameters.AddWithValue("@data_pagamento", dataPagamento);
             comando.Parameters.AddWithValue("@id", id);
 
-            // essa validação eu solicitei auxílio pro Gemini.
+            /* essa validação fica pra melhoria futura. Necessária revisão. Auxílio pro Gemini.
             if (dataPagamento.HasValue)
             {
                 comando.Parameters.AddWithValue("@data_pagamento", dataPagamento.Value);
@@ -161,7 +159,7 @@ class MensalidadeSQL
             else
             {
                 comando.Parameters.AddWithValue("@data_pagamento", DBNull.Value); // quando a mensal tá pendente, ainda não tem data de pagamento. ideia de permissão de "salvamento de espaço na memoria" para que o DB nao quebre 
-            }
+            }*/
 
             try
             {
