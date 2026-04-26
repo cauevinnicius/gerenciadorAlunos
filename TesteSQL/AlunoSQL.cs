@@ -69,7 +69,7 @@ class AlunoSQL
                             //instanciando nossa classe Aluno em um objeto de nome alunoEncontrado
                             // Console.Clear(); // tava ficando muito sujo a execução
                             Aluno alunoEncontrado = new Aluno();
-                            alunoEncontrado.Id = Convert.ToInt32(alunos["id"]); // pq int32? sugestão do gemini
+                            alunoEncontrado.Id = Convert.ToInt32(alunos["id"]); // pq int32? 32 inteiro, 64 long
                             alunoEncontrado.Nome = alunos["nome"].ToString();
                             alunoEncontrado.Cpf = alunos["cpf"].ToString();
                             alunoEncontrado.Email = alunos["email"].ToString();
@@ -184,23 +184,20 @@ class AlunoSQL
     // Método para deletar o cadastro
     public void Deletar(int id)
     {
-        // Comando SQL para inserirmos os nomes e cidades dos alunos
+
         string sql = "DELETE FROM alunos WHERE id = @id";
 
-        // Conexão com o banco de dados e execução do comando SQL
+
         using (var conexao = new MySqlConnection(_stringDeConexao))
         using (var comando = new MySqlCommand(sql, conexao))
         {
-            //Necessitamos especificar os parâmetros do SQL
+
             comando.Parameters.AddWithValue("@id", id);
 
-            // E, por fim, executar o comando SQL propriamente dito. É seguro usarmos try/catch
             try
             {
-                // Abrir a conexao com o banco e executar o comando.
                 conexao.Open();
                 comando.ExecuteNonQuery();
-                Console.WriteLine("Cadastro deletado com sucesso!");
             }
             catch (Exception excecao)
             {

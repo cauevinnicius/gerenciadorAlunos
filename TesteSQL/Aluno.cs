@@ -1,3 +1,4 @@
+// meu molde de aluno
 public class Aluno
 {
     public int Id { get; set; }

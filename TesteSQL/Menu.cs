@@ -1,7 +1,7 @@
 public class Menu
 {
 
-    enum ListaOpcoes { CadastrarAluno = 1, ListarAlunos, BuscarAluno, EditarAluno, DeletarAluno, LancarMensalidade, RegistrarPagamentoMensalidade, ListarMensalidadeAluno, VerificaPendencias, EditarMensalidade, ExcluirMensalidade, Sair }
+    enum ListaOpcoes { CadastrarAluno = 1, ListarAlunos, BuscarAluno, EditarAluno, DeletarAluno, LancarMensalidade, RegistrarPagamentoMensalidade, ListarMensalidades, VerificaPendencias, EditarMensalidade, ExcluirMensalidade, Sair }
 
     private readonly AlunoSQL _aluno;
     private readonly MensalidadeSQL _mensalidade;
@@ -51,8 +51,8 @@ public class Menu
                     case ListaOpcoes.RegistrarPagamentoMensalidade:
                         RegistrarPagamentoMensalidade();
                         break;
-                    case ListaOpcoes.ListarMensalidadeAluno:
-                        ListarMensalidadeAluno();
+                    case ListaOpcoes.ListarMensalidades:
+                        ListarMensalidades();
                         break;
                     case ListaOpcoes.VerificaPendencias:
                         VerificaPendencias();
@@ -71,24 +71,16 @@ public class Menu
             }
         }
     }
-
-    private void CadastrarAluno() // a minha ideia era fazer uma classe Cadastro e uma função CadastrarALuno(). Pesquisando sobre, neste projeto seria over-engeneering 
+    private void CadastrarAluno() // a minha ideia era fazer uma classe Cadastro e uma função CadastrarALuno(). *Final do Projeto - melhoria!
     {
         Console.Clear();
         Console.WriteLine("=== Menu de Cadastro de Aluno ===\n");
         Console.Write("Insira o nome do aluno(a): ");
         string nomeAluno = Console.ReadLine();
-        //Console.WriteLine("Insira o CPF do aluno(a) - 11 números: ");
-        // primeira ideia
-        // string? strCpfAluno = Console.ReadLine(1, 11);
-        // int.TryParse(strCpfAluno, out int intCpfAlunoIdBusca);
-        // segunda ideia - deixar simplesmente funcional
-        //int.TryParse(Console.ReadLine(), out int cpfAluno); // queria limitar o número de caracteres para 11. Fui pesquisar como fazer.
-        //terceira ideia - fazer um laço para ter o controle das situações que o usuário poderia se deparar e fazer.
-        string cpfFormatado = ""; // uma string vazia p formatação. Nesse ponto eu busquei entender porquê usarmos uma string invés de um int. 
+        string cpfFormatado = ""; // Se fosse um int, os zeros à esquerda seiram retirados. Além disso, é possível que o usuário digite pontos e traços
         bool cpfValido = false;
 
-        while (cpfValido == false) // seria legal uma revisão aqui
+        while (cpfValido == false)
         {
             Console.Write("Insira o CPF do aluno(a) - 11 números: ");
             string cpfAluno = Console.ReadLine();
@@ -113,21 +105,22 @@ public class Menu
         while (true)
         {
             Console.WriteLine("\n=== Novo aluno a ser cadastrado ===");
-            Console.WriteLine($"Nome do Aluno: {nomeAluno}\nCPF: {cpfValido}\nE-mail: {emailAluno}\nCelular: {celularAluno}\n\n");
+            Console.WriteLine($"Nome do Aluno: {nomeAluno}\nCPF: {cpfFormatado}\nE-mail: {emailAluno}\nCelular: {celularAluno}\n\n");
             Console.Write("Prosseguir com o cadastramento? (S/N): ");
-            string resposta = Console.ReadLine().ToUpper().Trim(); // ideia de prevenção de sempre passar para maiuscula e retirar espaços.
-            if (resposta == "S" || resposta == "SIM" || resposta == "Sim")
+            string resposta = Console.ReadKey().KeyChar.ToString().ToUpper().Trim(); // Aplicada a ideia sugerida pelo Sergio: Console.ReadKey. Tive que passar pra um .ToString se não estava dando erro. Ideia de prevenção de sempre passar para maiuscula e retirar espaços
+            if (resposta == "S")
             {
                 _aluno.Cadastrar(nomeAluno, cpfFormatado, emailAluno, celularAluno);
                 Console.WriteLine("=== Cadastro efetuado com sucesso! ===");
                 Console.WriteLine("Por gentileza, pressione Enter para retornar ao menu principal.");
+                Console.ReadLine();
                 break;
             }
-            else if (resposta == "N" || resposta == "NÃO" || resposta == "NAO")
+            else if (resposta == "N")
             {
                 Console.WriteLine("Cadastramento cancelado!");
                 Console.WriteLine("Por gentileza, pressione Enter para retornar ao menu principal.");
-                //return;
+                Console.ReadLine();
             }
             else
             {
@@ -156,8 +149,7 @@ public class Menu
         Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu principal.");
         Console.ReadLine(); // achei que eu tava com problemas na construção da minha listagem, mas, na verdade, a listagem aparecia tao rápido e voltava tão rápido ao menu q nao aparecia td. Dai coloquei um readline no fim.
     }
-
-    private void BuscarAluno()
+    private void BuscarAluno() //aqui me baseei na ideia anterior, mas incluindo mais validações
     {
         Console.Clear();
         Console.WriteLine("=== Pesquisa de Alunos(as) ===\n");
@@ -183,14 +175,13 @@ public class Menu
     {
         Console.Clear();
         Console.WriteLine("=== Edição de Cadastros de Alunos(as) ===\n");
-        Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: ");
+        //Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: "); // retirei pq já está vindo na minha _aluno.Selecionar.
         string termoBusca = Console.ReadLine(); // nessa daqui, diferente da BuscarAluno, quis criar uma variável pra guardar o que o usuário digitou.
 
         List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca); // aqui. Na Buscar eu coloquei o Console.ReadLine direto. Ver com o Sérgio é melhor (acredito q essa aqui)
-         // pra nao precisaar refazer tudo, usei a função do selecionar
+                                                                       // pra nao precisaar refazer tudo, usei a função do selecionar
 
-
-        if (alunosEncontrados.Count == 0)
+        if (alunosEncontrados.Count == 0) // validacao
         {
             Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
             Console.ReadLine();
@@ -201,25 +192,25 @@ public class Menu
 
         if (alunosEncontrados.Count == 1)
         {
-            alunoAtual = alunosEncontrados[0]; // ENTENDER!!!
+            alunoAtual = alunosEncontrados[0]; // a ideia aqui se baseia em encontrar 1 único aluno e retornar a posição 0 (ele mesmo) da nossa lista de alunosEncontrados
         }
         else
         {
             Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
-            foreach (Aluno a in alunosEncontrados)
+            foreach (Aluno a in alunosEncontrados) // para cada aluno encontrado, vou mostrar suas informações na tela.
             {
                 Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
             }
         }
 
         Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja editar: ");
-        if (int.TryParse(Console.ReadLine(), out int idEscolhido)) // PRECISO ENTENDER ESSA SITUAÇÃO AQUI!
+        if (int.TryParse(Console.ReadLine(), out int idDigitado)) // ta, basicamente eu to fazendo a validacao pra gerar um int do idDigitado
         {
-            foreach (Aluno a in alunosEncontrados)
+            foreach (Aluno a in alunosEncontrados) // faz sentido buscar apenas o único.
             {
-                if (a.Id == idEscolhido)
+                if (a.Id == idDigitado) // o ID do aluno é o mesmo que o digitado?
                 {
-                    alunoAtual = a; // 
+                    alunoAtual = a; // se sim, vou pegar meu objeto alunoAtual que disse que ele era nulo inicialmente e vou dar a ele o valor do objeto a 
                     break;
                 }
             }
@@ -232,12 +223,11 @@ public class Menu
             return;
         }
 
-        //PAREI AQUI. PRECISO ENTENDER ESSAS SITUAÇÕES ABAIXO!
-        Console.WriteLine("\nDeixe em branco e pressione Enter para manter o dado atual.");
+        Console.WriteLine("\nObservação: será possível deixar em branco e pressionar Enter para manter o dado atual.");
 
         Console.Write($"Nome atual ({alunoAtual.Nome}): ");
         string novoNome = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(novoNome)) novoNome = alunoAtual.Nome;
+        if (string.IsNullOrWhiteSpace(novoNome)) novoNome = alunoAtual.Nome; // entender melhor com o sérgio. Mas entendo que seria se o novoNome for nulo ou vazio, vou guardar o nome antigo. Se não, vou manter o nome novo.   
 
         Console.Write($"CPF atual ({alunoAtual.Cpf}): ");
         string novoCpf = Console.ReadLine();
@@ -247,29 +237,584 @@ public class Menu
         string novoEmail = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(novoEmail)) novoEmail = alunoAtual.Email;
 
-        // O Truque do Inteiro (Celular)
+
         Console.Write($"Celular atual ({alunoAtual.Celular}): ");
         string strCelular = Console.ReadLine();
-        int novoCelular = alunoAtual.Celular; // Por padrão, a variável já começa com o número antigo
-        
+        int novoCelular = alunoAtual.Celular; // aqui variável já começa com o número antigo
+
         if (!string.IsNullOrWhiteSpace(strCelular))
         {
-            // Se ele digitou algo, tentamos converter. Se der certo, substitui a variável
-            int.TryParse(strCelular, out novoCelular); 
+            // tentativa de conversão. Se der certo, substitui a variável
+            int.TryParse(strCelular, out novoCelular);
         }
 
-        // 4. Salvando no Banco de Dados
         _aluno.Alterar(novoNome, novoCpf, novoEmail, novoCelular, alunoAtual.Id);
-        
+
         Console.WriteLine("\nAlteração realizada com sucesso!");
         Console.ReadLine();
     }
+    private void DeletarAluno()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Edição de Cadastros de Alunos(as) ===\n");
+        //Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: "); retirei pq já esta vindo na minha _aluno.Selecionar.
+        string termoBusca = Console.ReadLine(); // nessa daqui, diferente da BuscarAluno, quis criar uma variável pra guardar o que o usuário digitou.
 
-    private void DeletarAluno() { Console.WriteLine("Teste"); }
-    private void LancarMensalidade() { Console.WriteLine("Teste"); }
-    private void RegistrarPagamentoMensalidade() { Console.WriteLine("Teste"); }
-    private void ListarMensalidadeAluno() { Console.WriteLine("Teste"); }
-    private void VerificaPendencias() { Console.WriteLine("Teste"); }
-    private void EditarMensalidade() { Console.WriteLine("Teste"); }
-    private void ExcluirMensalidade() { Console.WriteLine("Teste"); }
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca); // aqui. Na Buscar eu coloquei o Console.ReadLine direto. Ver com o Sérgio é melhor (acredito q essa aqui)
+                                                                       // pra nao precisaar refazer tudo, usei a função do selecionar
+
+        if (alunosEncontrados.Count == 0) // validacao
+        {
+            Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
+            Console.ReadLine();
+            return;
+        }
+
+        Aluno alunoAtual = null; // criei um objeto da classe Aluno nulo - pesquisei na internet para auxílio
+
+        if (alunosEncontrados.Count == 1)
+        {
+            alunoAtual = alunosEncontrados[0]; // a ideia aqui se baseia em encontrar 1 único aluno e retornar a posição 0 (ele mesmo) da nossa lista de alunosEncontrados
+        }
+        else
+        {
+            Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
+            foreach (Aluno a in alunosEncontrados) // para cada aluno encontrado, vou mostrar suas informações na tela.
+            {
+                Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
+            }
+        }
+
+        Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja deletar: ");
+        if (int.TryParse(Console.ReadLine(), out int idDigitado)) // ta, basicamente eu to fazendo a validacao pra gerar um int do idDigitado
+        {
+            foreach (Aluno a in alunosEncontrados) // o unico, faz mais sentido.
+            {
+                if (a.Id == idDigitado) // o ID do aluno é o mesmo que o digitado?
+                {
+                    alunoAtual = a; // se sim, vou pegar meu objeto alunoAtual que disse que ele era nulo inicialmente e vou dar a ele o valor do objeto a 
+                    break;
+                }
+            }
+        }
+        // validacao para caso o haja a digitação de um ID q não exista ou algo aleatorio
+        if (alunoAtual == null)
+        {
+            Console.WriteLine("\nHmm.. parece que esse ID é inválido! Tente novamente.");
+            Console.ReadLine();
+            return;
+        }
+
+        _aluno.Deletar(alunoAtual.Id);
+
+        Console.WriteLine("\nDeleção realizada com sucesso!");
+        Console.ReadLine();
+    }
+    private void LancarMensalidade() // basicamente reutilizei toda validação que construi antes, apenas implementando a funcionalidade de lançamento em si
+    {
+        Console.Clear();
+        Console.WriteLine("=== Lançamento de Mensalidades ===");
+        Console.WriteLine("Por gentileza, digite o ID ou o nome do(a) aluno(a)");
+        string termoBusca = Console.ReadLine();
+
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
+
+        if (alunosEncontrados.Count == 0) // validacao
+        {
+            Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
+            Console.ReadLine();
+            return;
+        }
+
+        Aluno alunoAtual = null; // criei um objeto da classe Aluno nulo - pesquisei na internet para auxílio
+
+        if (alunosEncontrados.Count == 1)
+        {
+            alunoAtual = alunosEncontrados[0]; // a ideia aqui se baseia em encontrar 1 único aluno e retornar a posição 0 (ele mesmo) da nossa lista de alunosEncontrados
+        }
+        else
+        {
+            Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
+            foreach (Aluno a in alunosEncontrados) // para cada aluno encontrado, vou mostrar suas informações na tela.
+            {
+                Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
+            }
+        }
+
+        Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja lançar a mensalidade: ");
+        if (int.TryParse(Console.ReadLine(), out int idDigitado)) // ta, basicamente eu to fazendo a validacao pra gerar um int do idDigitado
+        {
+            foreach (Aluno a in alunosEncontrados)
+            {
+                if (a.Id == idDigitado)
+                {
+                    alunoAtual = a;
+                    break;
+                }
+            }
+        }
+        // validacao para caso o haja a digitação de um ID q não exista ou algo aleatorio
+        if (alunoAtual == null)
+        {
+            Console.WriteLine("\nHmm.. parece que esse ID é inválido! Tente novamente.");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine($"Aluno(a): {alunoAtual.Nome}");
+        Console.Write("Por gentileza, digite o valor da mensalidade (R$)");
+
+        if (double.TryParse(Console.ReadLine(), out double valorMensalidade))
+        {
+            _mensalidade.LancarMensalidade(alunoAtual.Id, valorMensalidade);
+            Console.WriteLine("\nMensalidade lançada com sucesso!\n Pressione Enter para retornar ao menu principal!");
+            Console.ReadLine();
+        }
+        else
+        {
+            Console.WriteLine("Valor inválido!");
+        }
+
+        Console.ReadLine();
+
+    }
+    private void RegistrarPagamentoMensalidade()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
+        Console.WriteLine("Por gentileza, digite o ID ou o nome do(a) aluno(a)");
+        string termoBusca = Console.ReadLine();
+
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
+
+        if (alunosEncontrados.Count == 0)
+        {
+            Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
+            Console.ReadLine();
+            return;
+        }
+
+        Aluno alunoAtual = null;
+
+        if (alunosEncontrados.Count == 1)
+        {
+            alunoAtual = alunosEncontrados[0];
+        }
+        else
+        {
+            Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
+            foreach (Aluno a in alunosEncontrados)
+            {
+                Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
+            }
+
+            Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja lançar a mensalidade: ");
+            if (int.TryParse(Console.ReadLine(), out int idDigitado))
+            {
+                foreach (Aluno a in alunosEncontrados)
+                {
+                    if (a.Id == idDigitado)
+                    {
+                        alunoAtual = a;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (alunoAtual == null)
+        {
+            Console.WriteLine("\nHmm.. parece que esse ID é inválido! Tente novamente.");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine($"Aluno(a): {alunoAtual.Nome}");
+        // aqui seria a melhoria de mostrar na tela todas as mensalidades (uma lista) do aluno e poder verificar com precisão o que está pendente.
+        List<Mensalidade> faturas = _mensalidade.ListarMensalidades(alunoAtual.Id);
+
+        if (faturas.Count == 0)
+        {
+            Console.WriteLine("Este(a) aluno(a) não possui nenhuma mensalidade lançada.");
+            Console.ReadLine();
+            return;
+        }
+        foreach (var m in faturas)
+        {
+            Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}");
+        }
+
+        Console.Write("Por gentileza, digite o ID da mensalidade que deseja pagar: ");
+        if (int.TryParse(Console.ReadLine(), out int idMensalidade))
+        {
+            bool idExiste = false;
+            foreach (var f in faturas)
+            {
+                if (f.Id == idMensalidade)
+                {
+                    idExiste = true;
+                }
+            }
+            if (idExiste)
+            {
+                // tinha, inicialmente, só o bool sucesso. Mas quis fazer mais uma validação (acima) para caso o usuário digite um ID aleatório q nao exista
+                bool sucesso = _mensalidade.RegistrarPagamento(idMensalidade);
+                if (sucesso)
+                {
+                    Console.WriteLine("Pagamento registrado! O status foi alterado para 'pago'");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Hmm.. o ID da mensalidade parece incorreto. Tente novamente.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Hmm.. parece que esse ID de mensalidade é inválido. Tente novamente.");
+        }
+
+        Console.ReadLine();
+    }
+    private void ListarMensalidades()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
+        Console.WriteLine("Por gentileza, digite o ID ou o nome do(a) aluno(a)");
+        string termoBusca = Console.ReadLine();
+
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
+
+        if (alunosEncontrados.Count == 0)
+        {
+            Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
+            Console.ReadLine();
+            return;
+        }
+
+        Aluno alunoAtual = null;
+
+        if (alunosEncontrados.Count == 1)
+        {
+            alunoAtual = alunosEncontrados[0];
+        }
+        else
+        {
+            Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
+            foreach (Aluno a in alunosEncontrados)
+            {
+                Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
+            }
+
+            Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja lançar a mensalidade: ");
+            if (int.TryParse(Console.ReadLine(), out int idDigitado))
+            {
+                foreach (Aluno a in alunosEncontrados)
+                {
+                    if (a.Id == idDigitado)
+                    {
+                        alunoAtual = a;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (alunoAtual == null)
+        {
+            Console.WriteLine("\nHmm.. parece que esse ID é inválido! Tente novamente.");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine($"Aluno(a): {alunoAtual.Nome}");
+        List<Mensalidade> faturas = _mensalidade.ListarMensalidades(alunoAtual.Id);
+
+        if (faturas.Count == 0)
+        {
+            Console.WriteLine("Este(a) aluno(a) não possui nenhuma mensalidade lançada.");
+            Console.ReadLine();
+            return;
+        } // será q eu nao deveria ter posto um else aqui e o foreach dentro do else?
+        foreach (var m in faturas)
+        {
+            Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}");
+        }
+    }
+    private void VerificaPendencias()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
+        Console.WriteLine("Por gentileza, digite o ID ou o nome do(a) aluno(a)");
+        string termoBusca = Console.ReadLine();
+
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
+
+        if (alunosEncontrados.Count == 0)
+        {
+            Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
+            Console.ReadLine();
+            return;
+        }
+
+        Aluno alunoAtual = null;
+
+        if (alunosEncontrados.Count == 1)
+        {
+            alunoAtual = alunosEncontrados[0];
+        }
+        else
+        {
+            Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
+            foreach (Aluno a in alunosEncontrados)
+            {
+                Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
+            }
+
+            Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja lançar a mensalidade: ");
+            if (int.TryParse(Console.ReadLine(), out int idDigitado))
+            {
+                foreach (Aluno a in alunosEncontrados)
+                {
+                    if (a.Id == idDigitado)
+                    {
+                        alunoAtual = a;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (alunoAtual == null)
+        {
+            Console.WriteLine("\nHmm.. parece que esse ID é inválido! Tente novamente.");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine($"Hmm.. encontramos algumas pendências do(a) aluno(a): {alunoAtual.Nome}\n");
+        List<Mensalidade> pendencias = _mensalidade.VerificaPendencias(alunoAtual.Id);
+
+        if (pendencias.Count == 0)
+        {
+            Console.WriteLine("Maravilha! Este(a) aluno(a) não possui mensalidades pendentes!");
+        }
+        else
+        {
+            foreach (var m in pendencias)
+            {
+                Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}");
+            }
+        }
+
+        Console.WriteLine("Por gentileza, pressione Enter para voltar ao menu principal");
+        Console.ReadLine();
+    }
+    private void EditarMensalidade()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
+        Console.WriteLine("Por gentileza, digite o ID ou o nome do(a) aluno(a)");
+        string termoBusca = Console.ReadLine();
+
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
+
+        if (alunosEncontrados.Count == 0)
+        {
+            Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
+            Console.ReadLine();
+            return;
+        }
+
+        Aluno alunoAtual = null;
+
+        if (alunosEncontrados.Count == 1)
+        {
+            alunoAtual = alunosEncontrados[0];
+        }
+        else
+        {
+            Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
+            foreach (Aluno a in alunosEncontrados)
+            {
+                Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
+            }
+
+            Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja lançar a mensalidade: ");
+            if (int.TryParse(Console.ReadLine(), out int idDigitado))
+            {
+                foreach (Aluno a in alunosEncontrados)
+                {
+                    if (a.Id == idDigitado)
+                    {
+                        alunoAtual = a;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (alunoAtual == null)
+        {
+            Console.WriteLine("\nHmm.. parece que esse ID é inválido! Tente novamente.");
+            Console.ReadLine();
+            return;
+        }
+
+        List<Mensalidade> faturas = _mensalidade.ListarMensalidades(alunoAtual.Id);
+
+        if (faturas.Count == 0)
+        {
+            Console.WriteLine("\nEste aluno não possui nenhuma mensalidade lançada.");
+            Console.ReadLine();
+            return;
+        }
+        else
+        {
+            Console.WriteLine($"Mensalidades do(a) Aluno(a): {alunoAtual.Nome}");
+            foreach (var m in faturas)
+            {
+                Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}");
+            }
+        }
+
+        Console.WriteLine("\nPor gentileza, digite o ID da mensalidade que deseja editar: ");
+        if (!int.TryParse(Console.ReadLine(), out int idMensalidade))
+        {
+            Console.WriteLine("Hmm.. parece que esse ID é inválido!");
+            Console.ReadLine();
+            return;
+        }
+
+        Mensalidade faturaAtual = null;
+        foreach (var f in faturas)
+        {
+            if (f.Id == idMensalidade)
+            {
+                faturaAtual = f;
+            }
+        }
+
+        if (faturaAtual == null)
+        {
+            Console.WriteLine("Hmm.. não encontrei essa mensalidade");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine("\nPor gentileza, mantenha sem preenchimento e pressione Enter para manter os dados atuais");
+
+        Console.WriteLine($"Mensalidade atual (R$): {faturaAtual.ValorMensalidade}");
+        string strValor = Console.ReadLine();
+        decimal novoValor = faturaAtual.ValorMensalidade;
+        if (!string.IsNullOrWhiteSpace(strValor))
+        {
+            decimal.TryParse(strValor, out novoValor);
+        }
+
+        Console.WriteLine($"Data de vencimento atual: {faturaAtual.DataVencimento}");
+        string strVenc = Console.ReadLine();
+        DateTime novoVencimento = faturaAtual.DataVencimento;
+        if (!string.IsNullOrWhiteSpace(strVenc))
+        {
+            DateTime.TryParse(strVenc, out novoVencimento);
+        }
+
+        Console.WriteLine($"Status atual: {faturaAtual.Status}");
+        string novoStatus = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(novoStatus))
+        {
+            novoStatus = faturaAtual.Status;
+        }
+
+        DateTime? novaDataPagamento = faturaAtual.DataPagamento != DateTime.MinValue ? faturaAtual.DataPagamento : (DateTime?)null;
+        if (faturaAtual.DataPagamento != DateTime.MinValue)
+        {
+            Console.WriteLine($"Data de pagamento atual: {faturaAtual.DataPagamento.ToShortDateString()}");
+            string strDataPag = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(strDataPag))
+            {
+                if (DateTime.TryParse(strDataPag, out DateTime novaData))
+                {
+                    novaDataPagamento = novaData;
+                }
+            }
+        }
+
+        bool sucesso = _mensalidade.EditarMensalidade(novoValor, novoVencimento, novoStatus, novaDataPagamento, faturaAtual.Id);
+
+        if (sucesso)
+        {
+            Console.WriteLine("\nMensalidade atualizada com sucesso!");
+        }
+
+        Console.WriteLine("\nPressione Enter para voltar ao menu.");
+        Console.ReadLine();
+    }
+    private void ExcluirMensalidade()
+    {
+        Console.Clear();
+        Console.WriteLine("=== Exclusão de Mensalidades ===\n");
+        Console.WriteLine("Por gentileza, digite, o ID ou o nome da aluno(a):");
+        string termoBusca = Console.ReadLine();
+
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
+
+        if (alunosEncontrados.Count == 0)
+        {
+            Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
+            Console.ReadLine();
+            return;
+        }
+
+        Aluno alunoAtual = null;
+
+
+        if (alunosEncontrados.Count == 1)
+        {
+            alunoAtual = alunosEncontrados[0];
+        }
+        else
+        {
+            Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome.");
+            foreach (Aluno a in alunosEncontrados)
+            {
+                Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
+            }
+            Console.WriteLine("\nPor gentileza, digite o ID do aluno que deseja editar: ");
+            if (int.TryParse(Console.ReadLine(), out int idDigitado))
+            {
+                foreach (Aluno a in alunosEncontrados)
+                {
+                    if (a.Id == idDigitado)
+                    {
+                        alunoAtual = a;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (alunoAtual == null)
+        {
+            Console.WriteLine("\nHmm.. parece que esse ID é inválido! Tente novamente.");
+            Console.ReadLine();
+            return;
+        }
+        Console.WriteLine($"Aluno(a): {alunoAtual.Nome}"); // MELHORIA: no futuro, listar todas as mensaliaddes deste aluno antes de excluir, além de uma dupla validação
+        Console.Write("Por gentileza, digite o ID da mensalidade que deseja excluir:");
+
+        if (int.TryParse(Console.ReadLine(), out int idMensalidade))
+        {
+            _mensalidade.ExcluirMensalidade(idMensalidade);
+            Console.WriteLine("\nMensalidade excluída com sucesso!\n Pressione Enter para retornar ao menu principal!");
+            Console.ReadLine();
+        }
+        else
+        {
+            Console.WriteLine("ID inválido! Por gentileza, tente novamente.");
+        }
+
+        Console.ReadLine();
+    }
 }

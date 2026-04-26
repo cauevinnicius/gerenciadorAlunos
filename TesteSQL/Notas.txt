@@ -1,9 +1,9 @@
 STRINGs
 // Exemplo 1: Declarando uma string
-string nome = "Ralf";
+string nome = "Caue";
 
 // Exemplo 2: Concatenando strings
-string sobrenome = "Lima";
+string sobrenome = "Hermes";
 string nomeCompleto = nome + " " + sobrenome;
 
 // Exemplo 3: Interpolação de strings

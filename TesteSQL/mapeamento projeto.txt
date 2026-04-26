@@ -1,0 +1,50 @@
+(Página inicial)
+Gerenciador de Alunos
+
+ALUNOS
+1. Cadastrar aluno -> Abre um menu "Cadastrar Aluno", onde vamos inserir o nome, cpf, e-mail, telefone. Após a conclusão, exibir a mensagem "Aluno cadastrado com sucesso" e uma mensagem de "Enter para continuar..."
+
+2. Listar alunos -> Abre um menu "Listar Alunos", onde poderemos inserir três filtros diferentes, 1 = Todos, 2 = Ativos, 3 = Inativos. 
+	Se clicarmos no 1 (Todos), aparecerá uma listagem doa alunos. Aparecerá seu nome | CPF | Status e um Total de x alunos. Após a conclusão, exibir a mensagem "Aluno cadastrado com sucesso" e uma mensagem de "Enter para continuar..."
+
+	Se clicarmos no 2 (Ativos), aparecerá uma listagem dos alunoa ativos. Aparecerá seu nome | CPF | Status e um Total de x alunos e uma mensagem de "Enter para continuar..."
+
+	Se clicarmos no 3 (Inativos), aparecerá a listagem dos alunos inativos. Aparecerão seus nomes | CPF | Status e um total de x alunos. Após a conclusão, exibir a mensagem "Enter para continuar".
+	
+3. Buscar aluno -> Abre um menu "Buscar Aluno", onde eu poderei escolher a opção 1 = ID ou opção 2 = CPF.
+	Se eu escolher 1, tenho que inserir o ID do aluno. Aparecerá o ID, CPF, E-mail, Telefone, Matrícula e Status.
+	Se eu escolher 2, tenho que inserir o CPF do aluno. Aparecerá o ID, CPF, E-mail, Telefone, Matrícula e Status. 
+	Se não encontrar, haverá uma mensagem de "Aluno não encontrado". Após a conclusão, exibir a mensagem "Enter para continuar".
+
+4. Editar aluno -> Abre um menu "Editar Aluno", onde eu terei de informar o ID do aluno. 
+	Ao digitar o ID, aparecerá o ID, nome, CPF e status. Além disso, abaixo dessa mensagem, haverá "(Deixe em branco para manter o valor atual). 
+	Aparecerá para o usuário primeiro o Nome, E-mail, Telefone e se está ativo S/N. Após aparecerá um "Aluno atualizado com sucesso". Após a conclusão, exibir a mensagem "Enter para continuar".
+	
+5. Excluir aluno -> Abre um menu "Excluir Aluno", onde eu terei de informar o ID do aluno. Ao digitar o ID, aparecerá o ID, nome, CPF e status.
+	Além disso, abaixo haverá uma mensagem "Confirmar exclusão? (s/n)."
+	
+
+
+MENSALIDADES
+1. Lançar Mensalidade -> Abre um menu "Lançar mensalidades", onde eu terei de informar o ID do aluno. Ao informar o ID, deverei informar o valor (R$). Se eu inserir uma letra, por exemplo, haverá uma mensagem "Valor inválido - Ex. 150,00" e terei de inserir o valor novamente. Após, a data de vencimento (dd/mm/yyyy) e uma descrição (opcional). 
+
+2. Registrar pagamento -> Abre um menu "Registrar Pagamento" onde aparecerá uma listagem de todos os pagamentos, exibido ID, Nome | Valor | Vencimento (dd/mm/yyyy) | Status | Descrição.
+	Após eu digitar o ID, aparecerá se a mensalidade está paga ou não.
+	Se eu digitar um ID que não existe, uma mensagem de "Mensalidade não encontrada" aparecerá na tela. Se eu digitar uma letra invés de números, aparecerá uma mensagem "Informe um número inteiro positivo". Após a conclusão, enter para continuar.
+
+
+3. Mensalidade por aluno -> Abre um menu "Mensalidades por Aluno". Será exibido o ID do aluno, seu nome, valor da mensalidade, data de inserção (?), data de validade (DD/MM/YYYY), status e descrição.
+Abaixo aparecerá "Pago: | Em aberto: "
+
+4. Pendentes/Atrasadas -> Abre um menu "Pendentes e Atrasadas". Será exibido o ID do aluno, seu nome, valor da mensalidade, data de inserção (?), data de validade (DD/MM/YYYY), status e descrição.
+Abaixo aparecerá Total | Valor em aberto
+
+5. Editar -> Abre um menu "editar mensalidade". O usuário deverá inserir o ID da mensalidade (? como saber?). Será exibido o ID do aluno, seu nome, valor da mensalidade, data de validade (DD/MM/YYYY), status e descrição.
+Para o usuário, será possível alterar o Valor [valor] (em branco para manter o atual), vencimento, e o status, sendo 1= Pendente, 2=Pago, 3=Atrasado e Enter = manter.
+Por fim, aparecerá uma mensagem de "Mensalidade atualizada com sucesso".
+
+6. Excluir -> Abre um menu "Excluir Mensalidade". nde eu terei de informar o ID do aluno. Ao digitar o ID, aparecerá o ID, nome, CPF e status.
+	Além disso, abaixo haverá uma mensagem "Confirmar exclusão? (s/n)." - Se eu digitar algo diferente de S/N, aparecerá uma mensagem de "Operação Cancelada".
+
+
+
