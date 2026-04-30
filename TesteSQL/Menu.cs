@@ -29,7 +29,6 @@ public class Menu
                 ListaOpcoes escolha = (ListaOpcoes)opInt;
                 switch (escolha)
                 {
-                    // quis deixar o código o mais limpo possível. então inseri apenas a função de cadastrar em cada case
                     case ListaOpcoes.CadastrarAluno:
                         CadastrarAluno();
                         break;
