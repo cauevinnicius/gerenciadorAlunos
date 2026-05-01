@@ -98,14 +98,15 @@ public class Menu
         }
         Console.Write("Insira o e-mail do aluno(a): ");
         string emailAluno = Console.ReadLine();
-        Console.Write("Insira o celular do aluno(a) - apenas números: ");
-        int.TryParse(Console.ReadLine(), out int celularAluno);
+        Console.Write("Insira o celular do aluno(a): ");
+        string celularAluno = Console.ReadLine();
 
         while (true)
         {
             Console.WriteLine("\n=== Novo aluno a ser cadastrado ===");
             Console.WriteLine($"Nome do Aluno: {nomeAluno}\nCPF: {cpfFormatado}\nE-mail: {emailAluno}\nCelular: {celularAluno}\n\n");
             Console.Write("Prosseguir com o cadastramento? (S/N): ");
+
             string resposta = Console.ReadKey().KeyChar.ToString().ToUpper().Trim(); // Aplicada a ideia sugerida pelo Sergio: Console.ReadKey. Tive que passar pra um .ToString se não estava dando erro. Ideia de prevenção de sempre passar para maiuscula e retirar espaços
             Console.ReadLine(); // estava cadastrando direto, sem mostrar nenhuma mensagem.
             if (resposta == "S")
@@ -121,6 +122,7 @@ public class Menu
                 Console.WriteLine("Cadastramento cancelado!");
                 Console.WriteLine("Por gentileza, pressione Enter para retornar ao menu principal.");
                 Console.ReadLine();
+                break;
             }
             else
             {
@@ -129,7 +131,7 @@ public class Menu
 
         }
     }
-    private void ListarAlunos() // a minha primeira ideia não foi bem sucedida. Busquei pesquisar algumas alternativas para funcionar. A ideia sugerida foi criar uma classe Aluno.cs e por get/sets nos campos (nome, cpf, etc)
+    private void ListarAlunos() // Criada uma classe Aluno.cs e posto os get/sets nos campos (nome, cpf, etc)
     {
         Console.Clear();
         Console.WriteLine("=== Listagem de Alunos(as) ===\n");
@@ -151,36 +153,51 @@ public class Menu
     }
     private void BuscarAluno() //aqui me baseei na ideia anterior, mas incluindo mais validações
     {
-        Console.Clear();
-        Console.WriteLine("=== Pesquisa de Alunos(as) ===\n");
-        Console.WriteLine("Por gentileza, digite o ID ou nome do(a) aluno(a): \n");
-        List<Aluno> alunosDoBanco = _aluno.Selecionar(Console.ReadLine()); // eu busco a lista Aluno, coloco ela numa variável de nome alunosDoBanco e dou a ela o valor da função aluno.Listar.
-        //uma validação, inicialmente. Se não encontrar nada, já avisar pro usuário
-        if (alunosDoBanco.Count == 0)
+        while (true)
         {
-            Console.WriteLine("Hmm.. parece que ainda não há alunos(as) com esse ID ou nome.");
-            Console.WriteLine("Por gentileza, pressione Enter para retornar ao menu principal.");
+            Console.Clear();
+            Console.WriteLine("=== Pesquisa de Alunos(as) ===\n");
+            Console.Write("Por gentileza, digite o ID ou nome do(a) aluno(a): ");
+            string termoBusca = Console.ReadLine();
+            List<Aluno> alunosDoBanco = _aluno.Selecionar(termoBusca); // eu busco a lista Aluno, coloco ela numa variável de nome alunosDoBanco e dou a ela o valor da função aluno.Selecionar, passando o termo de busca.
+            //uma validação, inicialmente. Se não encontrar nada, já avisar pro usuário
+            if (alunosDoBanco.Count == 0)
+            {
+                Console.WriteLine("\nHmm.. parece que ainda não há alunos(as) com esse ID ou nome.");
+                Console.WriteLine("Deseja realizar uma nova pesquisa? (S/N): "); // NOVIDADE
+                string resposta = Console.ReadKey().KeyChar.ToString().ToUpper().Trim(); 
+                Console.ReadLine();
+                if (resposta == "S")
+                {
+                    continue;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            Console.WriteLine("\n=== Resultados da Pesquisa ===");
+            foreach (Aluno a in alunosDoBanco) // para cada Aluno que guardei na variável "a" presente no banco, vou printar seu ID, nome, cpf, email, etc.
+            {
+                Console.WriteLine($"ID: {a.Id}\nNome: {a.Nome}\nCPF: {a.Cpf}\nE-mail: {a.Email}\nCelular: {a.Celular}");
+                Console.WriteLine("===============================");
+            }
+            Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu principal.");
             Console.ReadLine();
-            return;
+
+            break;
         }
-        foreach (Aluno a in alunosDoBanco) // para cada Aluno que guardei na variável "a" presente no banco, vou printar seu ID, nome, cpf, email, etc.
-        {
-            Console.WriteLine($"ID: {a.Id}\nNome: {a.Nome}\nCPF: {a.Cpf}\nE-mail: {a.Email}\nCelular: {a.Celular}");
-            Console.WriteLine("===============================");
-        }
-        Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu principal.");
-        Console.ReadLine();
+
     }
     private void EditarAluno()
     {
         Console.Clear();
         Console.WriteLine("=== Edição de Cadastros de Alunos(as) ===\n");
         Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: ");
-        string termoBusca = Console.ReadLine(); // nessa daqui, diferente da BuscarAluno, quis criar uma variável pra guardar o que o usuário digitou.
+        string termoBusca = Console.ReadLine();
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
 
-        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca); // aqui. Na Buscar eu coloquei o Console.ReadLine direto. Ver com o Sérgio é melhor (acredito q essa aqui)
-
-        if (alunosEncontrados.Count == 0) // validacao
+        if (alunosEncontrados.Count == 0)
         {
             Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
             Console.ReadLine();
@@ -238,14 +255,8 @@ public class Menu
 
 
         Console.Write($"Celular atual ({alunoAtual.Celular}): ");
-        string strCelular = Console.ReadLine();
-        int novoCelular = alunoAtual.Celular; // aqui variável já começa com o número antigo
-
-        if (!string.IsNullOrWhiteSpace(strCelular))
-        {
-            // tentativa de conversão. Se der certo, substitui a variável
-            int.TryParse(strCelular, out novoCelular);
-        }
+        string novoCelular = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(novoCelular)) novoCelular = alunoAtual.Celular;
 
         _aluno.Alterar(novoNome, novoCpf, novoEmail, novoCelular, alunoAtual.Id);
 
@@ -255,12 +266,11 @@ public class Menu
     private void DeletarAluno()
     {
         Console.Clear();
-        Console.WriteLine("=== Edição de Cadastros de Alunos(as) ===\n");
-        Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja alterar: "); 
-        string termoBusca = Console.ReadLine(); // nessa daqui, diferente da BuscarAluno, quis criar uma variável pra guardar o que o usuário digitou.
+        Console.WriteLine("=== Deleção de Cadastros de Alunos(as) ===\n");
+        Console.WriteLine("Digite o ID ou o nome do aluno(a) que deseja deletar: ");
+        string termoBusca = Console.ReadLine();
+        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca);
 
-        List<Aluno> alunosEncontrados = _aluno.Selecionar(termoBusca); 
-       
         if (alunosEncontrados.Count == 0) // validacao
         {
             Console.WriteLine("Hmm.. Não encontrei nenhum aluno com esse nome ou ID.");
@@ -324,7 +334,7 @@ public class Menu
             return;
         }
 
-        Aluno alunoAtual = null; // criei um objeto da classe Aluno nulo - pesquisei na internet para auxílio
+        Aluno alunoAtual = null;
 
         if (alunosEncontrados.Count == 1)
         {
@@ -477,7 +487,7 @@ public class Menu
     {
         Console.Clear();
         Console.WriteLine("=== Listagem de Mensalidades ===\n");
-        
+
         List<Mensalidade> faturas = _mensalidade.ListarMensalidades();
 
         if (faturas.Count == 0)

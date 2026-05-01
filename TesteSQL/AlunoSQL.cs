@@ -14,7 +14,7 @@ class AlunoSQL
     }
 
     // Método para efetuar o cadastro
-    public void Cadastrar(string nome, string cpf, string email, int celular)
+    public void Cadastrar(string nome, string cpf, string email, string celular)
     {
         // Comando SQL para inserirmos os nomes e cidades dos alunos
         string sql = "INSERT INTO alunos (nome, cpf, email, celular) VALUES (@nome, @cpf, @email, @celular)";
@@ -67,13 +67,12 @@ class AlunoSQL
                         while (alunos.Read())
                         {
                             //instanciando nossa classe Aluno em um objeto de nome alunoEncontrado
-                            // Console.Clear(); // tava ficando muito sujo a execução
                             Aluno alunoEncontrado = new Aluno();
-                            alunoEncontrado.Id = Convert.ToInt32(alunos["id"]); // pq int32? 32 inteiro, 64 long
+                            alunoEncontrado.Id = Convert.ToInt32(alunos["id"]); // 32 inteiro, 64 long
                             alunoEncontrado.Nome = alunos["nome"].ToString();
                             alunoEncontrado.Cpf = alunos["cpf"].ToString();
                             alunoEncontrado.Email = alunos["email"].ToString();
-                            alunoEncontrado.Celular = Convert.ToInt32(alunos["celular"]);
+                            alunoEncontrado.Celular = alunos["celular"].ToString();
 
                             listaAlunos.Add(alunoEncontrado);
 
@@ -132,15 +131,12 @@ class AlunoSQL
                             alunoEncontrado.Nome = alunos["nome"].ToString();
                             alunoEncontrado.Cpf = alunos["cpf"].ToString();
                             alunoEncontrado.Email = alunos["email"].ToString();
-                            alunoEncontrado.Celular = Convert.ToInt32(alunos["celular"]);
+                            alunoEncontrado.Celular = alunos["celular"].ToString();
 
                             listaAlunos.Add(alunoEncontrado);
                         }
                     }
-                    else
-                    {
-                        Console.WriteLine("Hmm.. não foram encontrados alunos(a) com esse ID ou nome");
-                    }
+
                 }
             }
             catch (Exception excecao)
@@ -153,7 +149,7 @@ class AlunoSQL
     }
 
     // Método para alterar o cadastro
-    public void Alterar(string nome, string cpf, string email, int celular, int id)
+    public void Alterar(string nome, string cpf, string email, string celular, int id)
     {
 
         string sql = "UPDATE alunos SET nome = @nome, cpf = @cpf, email = @email, celular = @celular WHERE id = @id";

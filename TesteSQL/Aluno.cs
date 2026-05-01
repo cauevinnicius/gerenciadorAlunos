@@ -5,5 +5,5 @@ public class Aluno
     public string Nome { get; set; }
     public string Cpf { get; set; }
     public string Email { get; set; }
-    public int Celular { get; set; }
+    public string Celular { get; set; }
 }

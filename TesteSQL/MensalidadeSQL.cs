@@ -57,7 +57,6 @@ class MensalidadeSQL
             }
         }
     }
-
     public List<Mensalidade> ListarMensalidades()
     {
         List<Mensalidade> listaMensalidades = new List<Mensalidade>();
@@ -95,7 +94,6 @@ class MensalidadeSQL
         }
         return listaMensalidades;
     }
-
     public List<Mensalidade> VerificaPendencias(int aluno_id)
     {
         List<Mensalidade> listaMensalidades = new List<Mensalidade>();
@@ -136,7 +134,6 @@ class MensalidadeSQL
         }
         return listaMensalidades;
     }
-
     public bool EditarMensalidade(decimal valor, DateTime dataVencimento, string status, int id) // nem sempre teremos uma nova data de pagamento
     {
         string sql = "UPDATE mensalidades SET valor = @valor, data_vencimento = @data_vencimento, status = @status, data_pagamento = @data_pagamento WHERE id = @id";
@@ -194,5 +191,5 @@ class MensalidadeSQL
             }
         }
     }
-}
 
+}
