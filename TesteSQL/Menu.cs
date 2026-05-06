@@ -839,7 +839,7 @@ public class Menu
                 DateTime.TryParse(strVenc, out novoVencimento);
             }
 
-            Console.WriteLine($"Status atual: {faturaAtual.Status}");
+            Console.Write($"Status atual (pendente/pago/atrasado): ");
             string novoStatus = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(novoStatus))
             {
