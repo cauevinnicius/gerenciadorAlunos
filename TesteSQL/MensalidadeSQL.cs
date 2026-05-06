@@ -34,7 +34,7 @@ class MensalidadeSQL
         }
     }
     // modificação de void para um bool -> true se deu certo, false se deu ruim.
-    public bool RegistrarPagamento(int idMensalidade)
+    public bool RegistrarPagamento(int idMensalidade, DateTime dataPagamento)
     {
         string sql = "UPDATE mensalidades SET data_pagamento = @data_pagamento, status = 'pago' WHERE id = @id";
 
@@ -42,7 +42,7 @@ class MensalidadeSQL
         using (var comando = new MySqlCommand(sql, conexao))
         {
             comando.Parameters.AddWithValue("@id", idMensalidade);
-            comando.Parameters.AddWithValue("@data_pagamento", DateTime.Now);
+            comando.Parameters.AddWithValue("@data_pagamento", dataPagamento);
 
             try
             {
@@ -134,7 +134,7 @@ class MensalidadeSQL
         }
         return listaMensalidades;
     }
-    public bool EditarMensalidade(decimal valor, DateTime dataVencimento, string status, int id) // nem sempre teremos uma nova data de pagamento
+    public bool EditarMensalidade(decimal valor, DateTime dataVencimento, string status, int id, DateTime? dataPagamento) // nem sempre teremos uma nova data de pagamento. O padrão do C# é atribuir 01/01/0001. Nesse caso, temos que informar que sim, a data pode ser nula.
     {
         string sql = "UPDATE mensalidades SET valor = @valor, data_vencimento = @data_vencimento, status = @status, data_pagamento = @data_pagamento WHERE id = @id";
 
@@ -145,18 +145,17 @@ class MensalidadeSQL
             comando.Parameters.AddWithValue("@valor", valor);
             comando.Parameters.AddWithValue("@data_vencimento", dataVencimento);
             comando.Parameters.AddWithValue("@status", status);
-            //comando.Parameters.AddWithValue("@data_pagamento", dataPagamento);
             comando.Parameters.AddWithValue("@id", id);
 
-            /* essa validação fica pra melhoria futura. Necessária revisão. Auxílio pro Gemini.
+            // Correção do bug. Se tiver data (valor), vamos salvar a data normalmente.
             if (dataPagamento.HasValue)
             {
                 comando.Parameters.AddWithValue("@data_pagamento", dataPagamento.Value);
             }
-            else
+            else // senão, vamos salvar como nulo
             {
                 comando.Parameters.AddWithValue("@data_pagamento", DBNull.Value); // quando a mensal tá pendente, ainda não tem data de pagamento. ideia de permissão de "salvamento de espaço na memoria" para que o DB nao quebre 
-            }*/
+            }
 
             try
             {
