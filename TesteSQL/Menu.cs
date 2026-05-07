@@ -95,14 +95,18 @@ public class Menu
             }
             
             Console.WriteLine("\nHmm.. Encontramos mais de um aluno com esse nome:");
+            // Usando foreach tradicional
             foreach (Aluno a in alunosEncontrados)
             {
                 Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}");
             }
+            // Usando LAMBDA
+            //alunosEncontrados.ForEach(a => Console.WriteLine($"ID: {a.Id} | Nome: {a.Nome} | CPF: {a.Cpf}"));
 
             Console.Write("\nPor gentileza, digite o ID exato do aluno: ");
             if (int.TryParse(Console.ReadLine(), out int idDigitado))
             {
+                // Foreach tradicional
                 foreach (Aluno a in alunosEncontrados)
                 {
                     if (a.Id == idDigitado) 
@@ -110,6 +114,8 @@ public class Menu
                         return a; 
                     }
                 }
+                // Usando LAMBDA
+                // return alunosEncontrados.FirstOrDefault(a => a.Id == idDigitado);
             }
 
             Console.WriteLine("\nHmm.. parece que esse ID é inválido!");
@@ -179,7 +185,7 @@ public class Menu
 
         }
     }
-    private void ListarAlunos() // Criada uma classe Aluno.cs e posto os get/sets nos campos (nome, cpf, etc)
+    private void ListarAlunos() // Criada uma classe Aluno.cs e posto os get/sets nos campos (nome, cpf, etc) para servirem como molde.
     {
         Console.Clear();
         Console.WriteLine("=== Relatório Geral de Alunos(as) ===\n");
@@ -190,16 +196,21 @@ public class Menu
             Console.WriteLine("Por gentileza, pressione Enter para retornar ao menu principal.");
             return;
         }
+        // Foreach tradicional
         foreach (Aluno a in alunosDoBanco) // para cada Aluno que guardei na variável a presente no banco, vou printar seu ID, nome, cpf, email, etc.
         {
             Console.WriteLine($"ID: {a.Id}\nNome: {a.Nome}\nCPF: {a.Cpf}\nE-mail: {a.Email}\nCelular: {a.Celular}");
             Console.WriteLine("===============================");
         }
+        // Usando LAMBDA
+        // alunosDoBanco.ForEach(a => Console.WriteLine($"ID: {a.Id}\nNome: {a.Nome}\nCPF: {a.Cpf}\nE-mail: {a.Email}\nCelular: {a.Celular}"));
 
         Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu principal.");
         Console.ReadLine(); // achei que eu tava com problemas na construção da minha listagem, mas, na verdade, a listagem aparecia tao rápido e voltava tão rápido ao menu q nao aparecia td. Dai coloquei um readline no fim.
     }
-    private void BuscarAluno() //aqui me baseei na ideia anterior, mas incluindo mais validações
+    private void BuscarAluno() 
+    // Hoje está programado para que busque/apareça todos os alunos com aquele nome ou ID.
+    // Mas se eu quisesse deixar para que a pesquisa retorne apenas um único, poderia usufruir da CapturarAlunoSelecionado();
     {
         while (true)
         {
@@ -208,7 +219,7 @@ public class Menu
             Console.Write("Por gentileza, digite o ID ou nome do(a) aluno(a): ");
             string termoBusca = Console.ReadLine();
             List<Aluno> alunosDoBanco = _aluno.Selecionar(termoBusca); // eu busco a lista Aluno, coloco ela numa variável de nome alunosDoBanco e dou a ela o valor da função aluno.Selecionar, passando o termo de busca.
-            //uma validação, inicialmente. Se não encontrar nada, já avisar pro usuário
+            // Se não encontrar nada, já avisar pro usuário e oportunizar uma nova pesquisa.
             if (alunosDoBanco.Count == 0)
             {
                 Console.WriteLine("\nHmm.. parece que ainda não há alunos(as) com esse ID ou nome.");
@@ -220,11 +231,14 @@ public class Menu
             }
 
             Console.WriteLine("\n=== Resultados da Pesquisa ===");
+            // Tradicional
             foreach (Aluno a in alunosDoBanco) // para cada Aluno que guardei na variável "a" presente no banco, vou printar seu ID, nome, cpf, email, etc.
             {
                 Console.WriteLine($"ID: {a.Id}\nNome: {a.Nome}\nCPF: {a.Cpf}\nE-mail: {a.Email}\nCelular: {a.Celular}");
                 Console.WriteLine("===============================");
             }
+            // Usando LAMBDA
+            // alunosDoBanco.ForEach(a => Console.WriteLine($"ID: {a.Id}\nNome: {a.Nome}\nCPF: {a.Cpf}\nE-mail: {a.Email}\nCelular: {a.Celular}"));
             Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu principal.");
             Console.ReadLine();
 
@@ -372,10 +386,13 @@ public class Menu
                 break;
             }
 
+            // Usando foreach tradicional
             foreach (var m in faturas)
             {
                 Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}");
             }
+            // Usando LAMBDA
+            // faturas.ForEach(m => Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}"));
 
             Console.Write("Por gentileza, digite o ID da mensalidade que deseja pagar: ");
             if (int.TryParse(Console.ReadLine(), out int idMensalidade))
@@ -390,6 +407,9 @@ public class Menu
                         faturaSelecionada = f;
                     }
                 }
+                // Usando LAMBDA
+                // faturas.FirstOrDefault(f => f.Id == idMensalidade);
+                
                 // novas inclusões
                 if (faturaSelecionada != null)
                 {
@@ -455,6 +475,7 @@ public class Menu
         foreach (var m in faturas)
         {
             List<Aluno> buscaAluno = _aluno.Selecionar(m.AlunoId.ToString());
+            // Variável vazia para depois incluir nela a primeira posição da listagem
             string nomeAluno = "";
 
             if (buscaAluno.Count > 0)
@@ -493,10 +514,13 @@ public class Menu
             else
             {
                 Console.WriteLine("\nHmm.. encontramos as seguintes pendências\n");
+                // Tradicional foreach
                 foreach (var m in pendencias)
                 {
                     Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}");
                 }
+                // Usando LAMBDA
+                // pendencias.ForEach(m => Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento} | Status: {m.Status}"));
             }
 
             Console.WriteLine("\nPor gentileza, pressione Enter para voltar ao menu principal");
@@ -515,13 +539,20 @@ public class Menu
             if (alunoAtual == null) return;
 
             Console.WriteLine($"\n=== Mensalidades de {alunoAtual.Nome} ===");
+            // Buscando todas as faturas 
             List<Mensalidade> todasFaturas = _mensalidade.ListarMensalidades();
+            // Criando uma variável faturasDoAluno vazia
             List<Mensalidade> faturasDoAluno = new List <Mensalidade>();
             
             foreach(var fatura in todasFaturas)
-            {
+            {   
+                // Se passar na validação dos IDs, então vamos incluir as faturas dentro da nossa lista faturasDoAluno
                 if(fatura.AlunoId == alunoAtual.Id) faturasDoAluno.Add(fatura);
             }
+
+            // Usando LAMBDA
+            // Criar uma lista de mensalidades chamada faturasDoAluno, pegando todas as faturas onde cada fatura tenha o Id do Aluno igual ao Id do alunoAtual e transforme em uma lista.
+            // List<Mensalidade> faturasDoAluno = todasFaturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
 
             if (faturasDoAluno.Count == 0)
             {
@@ -530,11 +561,14 @@ public class Menu
                 Console.ReadLine();
                 break;
             }
-
+            // Foreach tradicional
             foreach (var m in faturasDoAluno)
             {
                 Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento.ToShortDateString()} | Status: {m.Status}");
             }
+
+            // Usando LAMBDA
+            // faturasDoAluno.ForEach(m => Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor: {m.ValorMensalidade} | Data de Vencimento: {m.DataVencimento.ToShortDateString()} | Status: {m.Status}"));
 
             Console.Write("\nPor gentileza, digite o ID da mensalidade que deseja editar: ");
             if (!int.TryParse(Console.ReadLine(), out int idMensalidade))
@@ -545,6 +579,7 @@ public class Menu
             }
 
             Mensalidade faturaAtual = null;
+            // Tradicional foreach
             foreach (var f in faturasDoAluno)
             {
                 if (f.Id == idMensalidade)
@@ -552,6 +587,9 @@ public class Menu
                     faturaAtual = f;
                 }
             }
+
+            // Usando LAMBDA
+            // faturasDoAluno.FirstOrDefault(f => f.Id == idMensalidade);
 
             if (faturaAtual == null)
             {
@@ -585,13 +623,13 @@ public class Menu
                 novoStatus = faturaAtual.Status;
             }
 
-            // como não sei se a faturaAtual tem ou não data de pagamento, vou dispor como padrão nula. 
+            // Como não sei se a faturaAtual tem ou não data de pagamento, vou dispor como padrão nula. 
             DateTime? novaDataPagamento = null;
             Console.Write("Data de pagamento (mantenha em branco caso não haja): ");
             string strDataPag = Console.ReadLine();
             if (!string.IsNullOrWhiteSpace(strDataPag))
             {
-                // mas se o usuário digitou uma data, vou capturá-la e salvar como novaDataPagamento.
+                // Mas se o usuário digitou uma data, vou capturá-la e salvar como novaDataPagamento.
                 if (DateTime.TryParse(strDataPag, out DateTime novaData))
                 {
                     novaDataPagamento = novaData;
@@ -635,7 +673,11 @@ public class Menu
                 }
             }
 
-            // se não houver mensalidades disponíveis para excluir
+            // Usando LAMBDA (copiada da EditarMensalidade)
+            // Criar uma lista de mensalidades chamada faturasDoAluno, pegando todas as faturas onde cada fatura tenha o Id do Aluno igual ao Id do alunoAtual e transforme em uma lista.
+            // List<Mensalidade> faturasDoAluno = todasFaturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
+
+            // Se não houver mensalidades disponíveis para excluir
             if (faturasDoAluno.Count == 0)
             {
                 Console.WriteLine("Este(a) aluno(a) não possui nenhuma mensalidade registrada!");
@@ -650,6 +692,9 @@ public class Menu
                 Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor {m.ValorMensalidade} | Vencimento: {m.DataVencimento.ToShortDateString()} | Status: {m.Status}");
             }
 
+            // Usando LAMBDA
+            // faturasDoAluno.ForEach(m => Console.WriteLine("ID da Mensalidade: {m.Id} | Valor {m.ValorMensalidade} | Vencimento: {m.DataVencimento.ToShortDateString()} | Status: {m.Status}"));
+
             Console.Write("\nPor gentileza, digite o ID da mensalidade que deseja excluir:");
 
             if (int.TryParse(Console.ReadLine(), out int idMensalidade))
@@ -663,8 +708,9 @@ public class Menu
                         break;
                     }
                 }
+                // faturasDoAluno.FirstOrDefault(f => f.Id == idMensalidade);
 
-                // agora sim, caso encontrada a mensalidade digitada:
+                // Agora sim, caso encontrada a mensalidade digitada (diferente de nula):
                 if (faturaSelecionada != null)
                 {
                     // dupla validação
