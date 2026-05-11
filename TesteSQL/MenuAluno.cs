@@ -109,42 +109,24 @@ public class MenuAluno
         Console.WriteLine("=== Menu de Cadastro de Aluno ===\n");
         Console.Write("Insira o nome do aluno(a): ");
         string nomeAluno = Console.ReadLine();
-        string cpfFormatado = ""; // Se fosse um int, os zeros à esquerda seiram retirados. Além disso, é possível que o usuário digite pontos e traços
-        bool cpfValido = false;
-
-        while (cpfValido == false)
-        {
-            Console.Write("Insira o CPF do aluno(a) - 11 números: ");
-            string cpfAluno = Console.ReadLine();
-            // a ideia agora seria prevenir que houvesse a digitação do usuário de pontos e traços. Depois pensei q não fazia tanto sentido pq eu logo abaixo faria a inserção novamente...
-            string cpfLimpo = cpfAluno.Replace(".", "").Replace("-", "").Trim();
-            // dai validar se deu certo mesmo, ou seja, tem 11 caracteres
-            if (cpfLimpo.Length == 11)
-            {
-                cpfFormatado = cpfLimpo.Insert(3, ".").Insert(7, ".").Insert(11, "-");
-                cpfValido = true;
-            }
-            else
-            {
-                Console.WriteLine("Hmm.. CPF inválido! Por gentileza, certifique-se que há onze números dígitados.");
-            }
-        }
+        Console.Write("Insira o CPF do aluno(a) - 11 números: ");
+        string cpfAluno = Console.ReadLine();
         Console.Write("Insira o e-mail do aluno(a): ");
         string emailAluno = Console.ReadLine();
-        Console.Write("Insira o celular do aluno(a): ");
+        Console.Write("Insira o celular do aluno(a) - (DDD + 9 números): ");
         string celularAluno = Console.ReadLine();
 
         while (true)
         {
             Console.WriteLine("\n=== Novo aluno a ser cadastrado ===");
-            Console.WriteLine($"Nome do Aluno: {nomeAluno}\nCPF: {cpfFormatado}\nE-mail: {emailAluno}\nCelular: {celularAluno}\n\n");
+            Console.WriteLine($"Nome do Aluno: {nomeAluno}\nCPF: {cpfAluno}\nE-mail: {emailAluno}\nCelular: {celularAluno}\n\n");
             Console.Write("Prosseguir com o cadastramento? (S/N): ");
 
             string resposta = Console.ReadKey().KeyChar.ToString().ToUpper().Trim(); // Aplicada a ideia sugerida pelo Sergio: Console.ReadKey. Tive que passar pra um .ToString se não estava dando erro. Ideia de prevenção de sempre passar para maiuscula e retirar espaços
             Console.ReadLine(); // estava cadastrando direto, sem mostrar nenhuma mensagem.
             if (resposta == "S")
             {
-                _aluno.Cadastrar(nomeAluno, cpfFormatado, emailAluno, celularAluno);
+                _aluno.Cadastrar(nomeAluno, cpfAluno, emailAluno, celularAluno);
                 Console.WriteLine("=== Cadastro efetuado com sucesso! ===");
                 Console.WriteLine("Por gentileza, pressione Enter para retornar ao menu principal.");
                 Console.ReadLine();
