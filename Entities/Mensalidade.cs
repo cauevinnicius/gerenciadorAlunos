@@ -1,4 +1,5 @@
 // meu molde de mensalidade
+namespace GerenciadorAlunos.Entities;
 public class Mensalidade
 {
     public int Id { get; set; }

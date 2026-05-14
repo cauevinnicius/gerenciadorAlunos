@@ -1,6 +1,8 @@
 /*
-
-DESUSO! Mantida no VSCode para fins de consulta de histórico apenas
+===============================================================================
+DESUSO! Mantido apenas para fins de histórico! 
+Para lembrança futura: assim foi feito o projeto sem o uso do EntityFramework e com Menu unificado.
+===============================================================================
 
 
 public class Menu

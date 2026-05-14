@@ -2,6 +2,8 @@
 // a ideia de dispor propriedades nos gets e sets seria dispor regras para ser possível ler ou inserir informações nas variáveis e de que maneira.
 // com isso, seria feito uma variavel privada e uma publica. A publica seria tipo um "porteiro" e a privada a "balada"/objetivo (backing field). 
 // Guard Clause: validar tudo primeiro. Se der erro, aborte a missão. Se houver sucesso em todos os testes, conclua a missão com sucesso.
+
+namespace GerenciadorAlunos.Entities;
 public class Aluno
 {
     // não seria necessário aplicar regras ao ID neste caso.

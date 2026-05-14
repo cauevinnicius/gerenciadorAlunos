@@ -1,8 +1,11 @@
+namespace GerenciadorAlunos.UI;
+using GerenciadorAlunos.Entities;
+using GerenciadorAlunos.Repositories;
 public class MenuPrincipal
 {
-    private readonly AlunoSQL _aluno;
-    private readonly MensalidadeSQL _mensalidade;
-    internal MenuPrincipal(AlunoSQL aluno, MensalidadeSQL mensalidade)
+    private readonly AlunoRepository _aluno;
+    private readonly MensalidadeRepository _mensalidade;
+    internal MenuPrincipal(AlunoRepository aluno, MensalidadeRepository mensalidade)
     {
         _aluno = aluno;
         _mensalidade = mensalidade;

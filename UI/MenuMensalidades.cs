@@ -1,3 +1,6 @@
+namespace GerenciadorAlunos.UI;
+using GerenciadorAlunos.Entities;
+using GerenciadorAlunos.Repositories;
 public class MenuMensalidades
 {
     private readonly AlunoSQL _aluno;
