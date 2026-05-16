@@ -4,10 +4,10 @@ using GerenciadorAlunos.Repositories;
 
 public class MenuAluno
 {
-    private readonly AlunoSQL _aluno;
+    private readonly AlunoRepository _aluno;
 
     // Construtor
-    internal MenuAluno(AlunoSQL aluno)
+    internal MenuAluno(AlunoRepository aluno)
     {
         _aluno = aluno;
     }
@@ -130,7 +130,17 @@ public class MenuAluno
             Console.ReadLine(); // estava cadastrando direto, sem mostrar nenhuma mensagem.
             if (resposta == "S")
             {
-                _aluno.Cadastrar(nomeAluno, cpfAluno, emailAluno, celularAluno);
+                // agora eu instancio minha classe Aluno
+                Aluno novoAluno = new Aluno
+                {
+                    Nome = nomeAluno,
+                    Cpf = cpfAluno,
+                    Email = emailAluno,
+                    Celular = celularAluno
+                };
+                // e faço o método normalmente
+                _aluno.Cadastrar(novoAluno);
+
                 Console.WriteLine("=== Cadastro efetuado com sucesso! ===");
                 Console.WriteLine("Por gentileza, pressione Enter para retornar ao menu principal.");
                 Console.ReadLine();
@@ -240,7 +250,7 @@ public class MenuAluno
             string novoCelular = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(novoCelular)) novoCelular = alunoAtual.Celular;
 
-            _aluno.Alterar(novoNome, novoCpf, novoEmail, novoCelular, alunoAtual.Id);
+            _aluno.Alterar(alunoAtual);
 
             Console.WriteLine("\nAlteração realizada com sucesso!");
             Console.Write("Por gentileza, pressione Enter para voltar ao menu principal.");

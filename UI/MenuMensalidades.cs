@@ -1,21 +1,22 @@
 namespace GerenciadorAlunos.UI;
+
 using GerenciadorAlunos.Entities;
 using GerenciadorAlunos.Repositories;
 public class MenuMensalidades
 {
-    private readonly AlunoSQL _aluno;
-    private readonly MensalidadeSQL _mensalidade;
+    private readonly AlunoRepository _aluno;
+    private readonly MensalidadeRepository _mensalidade;
     private readonly MenuAluno _menuAlunoAux;
 
-    internal MenuMensalidades(AlunoSQL aluno, MensalidadeSQL mensalidade)
+    internal MenuMensalidades(AlunoRepository aluno, MensalidadeRepository mensalidade)
     {
         _aluno = aluno;
         _mensalidade = mensalidade;
         // Instanciando o auxiliar, passando a conexão do db
-        _menuAlunoAux = new MenuAluno(_aluno); 
+        _menuAlunoAux = new MenuAluno(_aluno);
     }
 
-    enum ListaOpcoes { LancarMensalidade = 1, RegistrarPagamentoMensalidade, ListarMensalidades, VerificaPendencias, EditarMensalidade, ExcluirMensalidade, Voltar}
+    enum ListaOpcoes { LancarMensalidade = 1, RegistrarPagamentoMensalidade, ListarMensalidades, VerificaPendencias, EditarMensalidade, ExcluirMensalidade, Voltar }
 
     public void ExibirMenu()
     {
@@ -71,7 +72,7 @@ public class MenuMensalidades
             Console.WriteLine("=== Lançamento de Mensalidades ===");
             // Utilizando o auxiliar para devolver o resultado
             Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
-            
+
             if (alunoAtual == null) return;
 
             Console.WriteLine($"\nAluno(a): {alunoAtual.Nome}");
@@ -86,7 +87,16 @@ public class MenuMensalidades
                 Console.ReadLine();
                 if (resposta == "S")
                 {
-                    _mensalidade.LancarMensalidade(alunoAtual.Id, valorMensalidade);
+                    // instancio a mensalidade
+                    Mensalidade novaMensalidade = new Mensalidade
+                    {
+                        AlunoId = alunoAtual.Id,
+                        ValorMensalidade = Convert.ToDecimal(valorMensalidade),
+                        Status = "pendente"
+                    };
+
+                    _mensalidade.LancarMensalidade(novaMensalidade);
+
                     Console.WriteLine("\nMensalidade lançada com sucesso!");
                     Console.WriteLine("\nPressione Enter para retornar ao menu principal!");
                     Console.ReadLine();
@@ -117,12 +127,15 @@ public class MenuMensalidades
             Console.Clear();
             Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
             Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
-            
+
             if (alunoAtual == null) return;
 
             Console.WriteLine("=== Listagem de Faturas ===");
             Console.WriteLine($"ID: {alunoAtual.Id} | Aluno(a): {alunoAtual.Nome} | CPF: {alunoAtual.Cpf}");
             List<Mensalidade> faturas = _mensalidade.ListarMensalidades();
+
+            // filtra faturas do aluno atual
+            List<Mensalidade> faturasDoAluno = faturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
 
             if (faturas.Count == 0)
             {
@@ -143,19 +156,8 @@ public class MenuMensalidades
             Console.Write("Por gentileza, digite o ID da mensalidade que deseja pagar: ");
             if (int.TryParse(Console.ReadLine(), out int idMensalidade))
             {
-                // antes a ideia era muito simples. Apenas inseria o id da mensalidade e o bool como true já era o suficente para o registro do pagamento.
-                // quis incluir novas situações para melhorar a experiencia do programa, além de algumas validações de consistência
-                Mensalidade faturaSelecionada = null;
-                foreach (var f in faturas)
-                {
-                    if (f.Id == idMensalidade)
-                    {
-                        faturaSelecionada = f;
-                    }
-                }
-                // Usando LAMBDA
-                // faturas.FirstOrDefault(f => f.Id == idMensalidade);
-                
+                Mensalidade faturaSelecionada = faturasDoAluno.FirstOrDefault(f => f.Id == idMensalidade);
+
                 // novas inclusões
                 if (faturaSelecionada != null)
                 {
@@ -187,7 +189,7 @@ public class MenuMensalidades
                     }
                     else
                     {
-                        Console.WriteLine("\nHmm.. O ID da mensalidade inserido parece incorreto. Tente novamente.");
+                        Console.WriteLine("\nOperação cancelada!");
                     }
                 }
                 else
@@ -229,7 +231,7 @@ public class MenuMensalidades
                 nomeAluno = buscaAluno[0].Nome;
             }
             // li que os numeros negativos alinham à esquerda e os positivos à direita.
-            Console.WriteLine($"{m.Id, -14} | {m.AlunoId, -8} | {nomeAluno, -20} | {m.ValorMensalidade, 11} | {m.DataVencimento.ToShortDateString(), -10} | {m.Status.ToUpper()}");
+            Console.WriteLine($"{m.Id,-14} | {m.AlunoId,-8} | {nomeAluno,-20} | {m.ValorMensalidade,11} | {m.DataVencimento.ToShortDateString(),-10} | {m.Status.ToUpper()}");
         }
 
         Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu Principal");
@@ -237,12 +239,12 @@ public class MenuMensalidades
     }
     private void VerificaPendencias()
     {
-        while(true)
+        while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Verificação de Pendências ===");
             Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
-            
+
             if (alunoAtual == null) return;
 
             Console.Clear();
@@ -276,29 +278,19 @@ public class MenuMensalidades
     }
     private void EditarMensalidade()
     {
-        while(true)
+        while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Edição de Mensalidades ===");
             Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
-            
+
             if (alunoAtual == null) return;
 
             Console.WriteLine($"\n=== Mensalidades de {alunoAtual.Nome} ===");
             // Buscando todas as faturas 
             List<Mensalidade> todasFaturas = _mensalidade.ListarMensalidades();
-            // Criando uma variável faturasDoAluno vazia
-            List<Mensalidade> faturasDoAluno = new List <Mensalidade>();
-            
-            foreach(var fatura in todasFaturas)
-            {   
-                // Se passar na validação dos IDs, então vamos incluir as faturas dentro da nossa lista faturasDoAluno
-                if(fatura.AlunoId == alunoAtual.Id) faturasDoAluno.Add(fatura);
-            }
-
-            // Usando LAMBDA
-            // Criar uma lista de mensalidades chamada faturasDoAluno, pegando todas as faturas onde cada fatura tenha o Id do Aluno igual ao Id do alunoAtual e transforme em uma lista.
-            // List<Mensalidade> faturasDoAluno = todasFaturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
+            // já filtrando para buscar apenas o aluno no id inserido (igual excluir)
+            List<Mensalidade> faturasDoAluno = todasFaturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
 
             if (faturasDoAluno.Count == 0)
             {
@@ -324,18 +316,7 @@ public class MenuMensalidades
                 break;
             }
 
-            Mensalidade faturaAtual = null;
-            // Tradicional foreach
-            foreach (var f in faturasDoAluno)
-            {
-                if (f.Id == idMensalidade)
-                {
-                    faturaAtual = f;
-                }
-            }
-
-            // Usando LAMBDA
-            // faturasDoAluno.FirstOrDefault(f => f.Id == idMensalidade);
+            Mensalidade faturaAtual = faturasDoAluno.FirstOrDefault(f => f.Id == idMensalidade);
 
             if (faturaAtual == null)
             {
@@ -346,44 +327,35 @@ public class MenuMensalidades
 
             Console.WriteLine("\nPor gentileza, mantenha sem preenchimento e pressione Enter para manter os dados atuais");
 
-            Console.WriteLine($"Mensalidade atual (R$): {faturaAtual.ValorMensalidade}");
             string strValor = Console.ReadLine();
-            decimal novoValor = faturaAtual.ValorMensalidade;
-            if (!string.IsNullOrWhiteSpace(strValor))
+            if (!string.IsNullOrWhiteSpace(strValor) && decimal.TryParse(strValor, out decimal novoValor))
             {
-                decimal.TryParse(strValor, out novoValor);
+                faturaAtual.ValorMensalidade = novoValor;
             }
 
-            Console.WriteLine($"Data de vencimento atual: {faturaAtual.DataVencimento}");
+            Console.WriteLine($"Data de vencimento atual: {faturaAtual.DataVencimento.ToShortDateString()}");
             string strVenc = Console.ReadLine();
-            DateTime novoVencimento = faturaAtual.DataVencimento;
-            if (!string.IsNullOrWhiteSpace(strVenc))
+            if (!string.IsNullOrWhiteSpace(strVenc) && DateTime.TryParse(strVenc, out DateTime novoVencimento))
             {
-                DateTime.TryParse(strVenc, out novoVencimento);
+                faturaAtual.DataVencimento = novoVencimento;
             }
 
-            Console.Write($"Status atual (pendente/pago/atrasado): ");
+            Console.Write($"Status atual ({faturaAtual.Status}): ");
             string novoStatus = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(novoStatus))
+            if (!string.IsNullOrWhiteSpace(novoStatus))
             {
-                novoStatus = faturaAtual.Status;
+                faturaAtual.Status = novoStatus;
             }
 
-            // Como não sei se a faturaAtual tem ou não data de pagamento, vou dispor como padrão nula. 
-            DateTime? novaDataPagamento = null;
-            Console.Write("Data de pagamento (mantenha em branco caso não haja): ");
+            Console.Write($"Data de pagamento (mantenha em branco caso não haja): ");
             string strDataPag = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(strDataPag))
+            if (!string.IsNullOrWhiteSpace(strDataPag) && DateTime.TryParse(strDataPag, out DateTime novaData))
             {
-                // Mas se o usuário digitou uma data, vou capturá-la e salvar como novaDataPagamento.
-                if (DateTime.TryParse(strDataPag, out DateTime novaData))
-                {
-                    novaDataPagamento = novaData;
-                }
+                faturaAtual.DataPagamento = novaData;
             }
-          
 
-            bool sucesso = _mensalidade.EditarMensalidade(novoValor, novoVencimento, novoStatus, faturaAtual.Id, novaDataPagamento);
+
+            bool sucesso = _mensalidade.EditarMensalidade(faturaAtual);
 
             if (sucesso)
             {
@@ -397,31 +369,20 @@ public class MenuMensalidades
     }
     private void ExcluirMensalidade()
     {
-        while(true)
+        while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Exclusão de Mensalidades ===\n");
             Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
-            
+
             if (alunoAtual == null) return;
 
             Console.WriteLine($"=== Mensalidades de {alunoAtual.Nome} ==="); // MELHORIA FEITA! - no futuro, listar todas as mensaliaddes deste aluno antes de excluir, além de uma dupla validação
-            
-            // aqui a ideia foi buscar do banco todas as mensalidades e criar uma lista nova e ainda vazia apenas para o aluno selecionado           
-            List<Mensalidade> todasFaturas = _mensalidade.ListarMensalidades(); 
-            List<Mensalidade> faturasDoAluno = new List<Mensalidade>();
-            
-            foreach(var fatura in todasFaturas)
-            {
-                if(fatura.AlunoId == alunoAtual.Id)
-                {
-                    faturasDoAluno.Add(fatura);
-                }
-            }
 
-            // Usando LAMBDA (copiada da EditarMensalidade)
-            // Criar uma lista de mensalidades chamada faturasDoAluno, pegando todas as faturas onde cada fatura tenha o Id do Aluno igual ao Id do alunoAtual e transforme em uma lista.
-            // List<Mensalidade> faturasDoAluno = todasFaturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
+            // aqui a ideia foi buscar do banco todas as mensalidades e criar uma lista nova e ainda vazia apenas para o aluno selecionado           
+            List<Mensalidade> todasFaturas = _mensalidade.ListarMensalidades();
+            // uma lista de mensalidades chamada faturasDoAluno, pegando todas as faturas onde cada fatura tenha o Id do Aluno igual ao Id do alunoAtual e transformando em uma lista
+            List<Mensalidade> faturasDoAluno = todasFaturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
 
             // Se não houver mensalidades disponíveis para excluir
             if (faturasDoAluno.Count == 0)
@@ -433,7 +394,7 @@ public class MenuMensalidades
             }
 
             // exibição das faturas em tela
-            foreach(var m in faturasDoAluno)
+            foreach (var m in faturasDoAluno)
             {
                 Console.WriteLine($"ID da Mensalidade: {m.Id} | Valor {m.ValorMensalidade} | Vencimento: {m.DataVencimento.ToShortDateString()} | Status: {m.Status}");
             }
@@ -445,31 +406,20 @@ public class MenuMensalidades
 
             if (int.TryParse(Console.ReadLine(), out int idMensalidade))
             {
-                Mensalidade faturaSelecionada = null;
-                foreach(var f in faturasDoAluno)
-                {
-                    if (f.Id == idMensalidade)
-                    {
-                        faturaSelecionada = f;
-                        break;
-                    }
-                }
-                // faturasDoAluno.FirstOrDefault(f => f.Id == idMensalidade);
+                Mensalidade faturaSelecionada = faturasDoAluno.FirstOrDefault(f => f.Id == idMensalidade);
 
-                // Agora sim, caso encontrada a mensalidade digitada (diferente de nula):
                 if (faturaSelecionada != null)
                 {
-                    // dupla validação
                     Console.Clear();
                     Console.WriteLine("=== Exclusão de Mensalidades ===");
                     Console.WriteLine("\nImportante: essa ação não poderá ser desfeita!\n");
-                    Console.WriteLine($"\nAluno(a): {alunoAtual.Nome}\nID da Mensalidade: {faturaSelecionada.Id}\nValor: {faturaSelecionada.ValorMensalidade}\nVencimento: {faturaSelecionada.DataVencimento}\nStatus: {faturaSelecionada.Status})");
+                    Console.WriteLine($"\nAluno(a): {alunoAtual.Nome}\nID da Mensalidade: {faturaSelecionada.Id}\nValor: {faturaSelecionada.ValorMensalidade}\nVencimento: {faturaSelecionada.DataVencimento.ToShortDateString()}\nStatus: {faturaSelecionada.Status}");
                     Console.Write($"\nPor gentileza, você deseja seguir com a exclusão da mensalidade {faturaSelecionada.Id}? (S/N): ");
 
-                    if(Console.ReadLine().ToUpper().Trim() == "S")
+                    if (Console.ReadLine().ToUpper().Trim() == "S")
                     {
                         _mensalidade.ExcluirMensalidade(idMensalidade);
-                        Console.WriteLine("\nMensalidade excluída com sucesso!");     
+                        Console.WriteLine("\nMensalidade excluída com sucesso!");
                     }
                     else
                     {
@@ -483,9 +433,7 @@ public class MenuMensalidades
 
                 Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao Menu principal!");
                 Console.ReadLine();
-
                 break;
-
             }
         }
     }
