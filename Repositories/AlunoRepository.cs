@@ -17,6 +17,7 @@ public class AlunoRepository
     }
 
     // Método para efetuar o cadastro. Agora eu posso simplesmente chamar meu molde Aluno e criar um objeto novoAluno (WTF)
+    // Perguntar pro Sérgio: Pensei em por um bool, retornando true após o savechanges e false no catch
     public void Cadastrar(Aluno novoAluno)
     {
         try
@@ -30,6 +31,7 @@ public class AlunoRepository
         }
     }
 
+    // Perguntar pro Sérgio: pesquisando na internet, vi que não seria uma boa prática inserir try/catch em TODOS. Para métodos de leitura (listar, selecionar, verificarpendencias) não faz sentido, mas tão somente para escritas (cadatro, alterar e deletar)
     public List<Aluno> Listar()
     {
         return _context.Alunos.ToList(); // literalmente 46 linhas se transformaram em 4.

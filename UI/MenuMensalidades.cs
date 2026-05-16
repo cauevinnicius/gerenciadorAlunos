@@ -218,7 +218,7 @@ public class MenuMensalidades
             return;
         }
         // tentei estrutar como se fosse um relatório mesmo
-        Console.WriteLine("ID MENSALIDADE | ID ALUNO | ALUNO(A)            | VALOR (R$)  | VENCIMENTO | STATUS");
+        Console.WriteLine("ID MENSALIDADE | ID ALUNO | ALUNO(A)             | VALOR (R$)  | VENCIMENTO | STATUS");
         Console.WriteLine("--------------------------------------------------------------------------------------");
         foreach (var m in faturas)
         {

@@ -5,7 +5,8 @@ public class Mensalidade
     public int Id { get; set; }
     public int AlunoId { get; set; }
     public DateTime DataVencimento { get; set; }
-    public DateTime DataPagamento { get; set; }
+    // necessária a inclusão do ?, significando que é possível ser nula a data de pagamento.
+    public DateTime? DataPagamento { get; set; }
 
     private decimal _valorMensalidade;
     public decimal ValorMensalidade

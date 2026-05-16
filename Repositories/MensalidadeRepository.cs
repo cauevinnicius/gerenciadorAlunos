@@ -13,7 +13,7 @@ public class MensalidadeRepository
     {
         _context = context;
     }
-
+    // Perguntar pro Sérgio: (mesma da alunorepository) - devo deixar aqui os try/catch ou por no menu? Além disso, seria melhor transformar em um bool como fiz na Registrar?
     public void LancarMensalidade(Mensalidade novaMensalidade)
     {
         try
@@ -48,6 +48,8 @@ public class MensalidadeRepository
     {
         return _context.Mensalidades.ToList();
     }
+
+    // a escrita está dessa forma para fins de organização. De fato, seria posto tudo em uma única linha
     public List<Mensalidade> VerificaPendencias(int alunoId)
     {
         return _context.Mensalidades

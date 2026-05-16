@@ -20,7 +20,7 @@ public class MenuAluno
             Console.Clear();
             Console.WriteLine("=== Menu de Alunos ===\n");
             Console.WriteLine("(1) Cadastrar Aluno(a)\n(2) Relatório de Alunos(as)\n(3) Pesquisar Aluno(a)\n(4) Editar Aluno(a)\n(5) Deletar Aluno(a)\n(6) Voltar");
-            Console.Write("\nPor gentileza, escolha a opção desejada:");
+            Console.Write("\nPor gentileza, escolha a opção desejada: ");
             int.TryParse(Console.ReadLine(), out int opInt);
 
             if (opInt > 0 && opInt <= 6)
@@ -139,6 +139,7 @@ public class MenuAluno
                     Celular = celularAluno
                 };
                 // e faço o método normalmente
+                // Perguntar pro Sérgio: devo colocar os try/catch aqui ou lá no meu repository? Pelas minhas pesquisas, encontrei algumas divergências e fiquei em dúvida. 
                 _aluno.Cadastrar(novoAluno);
 
                 Console.WriteLine("=== Cadastro efetuado com sucesso! ===");
