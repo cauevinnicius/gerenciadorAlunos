@@ -17,8 +17,8 @@ public class MenuMensalidades
     }
 
     enum ListaOpcoes { LancarMensalidade = 1, RegistrarPagamentoMensalidade, ListarMensalidades, VerificaPendencias, EditarMensalidade, ExcluirMensalidade, Voltar }
-
-    public void ExibirMenu()
+    // mesma coisa que fiz no MenuAlunos, faço as devidas refatorações
+    public async Task ExibirMenu()
     {
         while (true)
         {
@@ -34,27 +34,27 @@ public class MenuMensalidades
                 switch (escolha)
                 {
                     case ListaOpcoes.LancarMensalidade:
-                        LancarMensalidade();
+                        await LancarMensalidade();
                         break;
 
                     case ListaOpcoes.RegistrarPagamentoMensalidade:
-                        RegistrarPagamentoMensalidade();
+                        await RegistrarPagamentoMensalidade();
                         break;
 
                     case ListaOpcoes.ListarMensalidades:
-                        ListarMensalidades();
+                        await ListarMensalidades();
                         break;
 
                     case ListaOpcoes.VerificaPendencias:
-                        VerificaPendencias();
+                        await VerificaPendencias();
                         break;
 
                     case ListaOpcoes.EditarMensalidade:
-                        EditarMensalidade();
+                        await EditarMensalidade();
                         break;
 
                     case ListaOpcoes.ExcluirMensalidade:
-                        ExcluirMensalidade();
+                        await ExcluirMensalidade();
                         break;
 
                     case ListaOpcoes.Voltar:
@@ -64,14 +64,14 @@ public class MenuMensalidades
         }
     }
 
-    private void LancarMensalidade()
+    private async Task LancarMensalidade()
     {
         while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Lançamento de Mensalidades ===");
             // Utilizando o auxiliar para devolver o resultado
-            Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
+            Aluno alunoAtual = await _menuAlunoAux.CapturarAlunoSelecionado();
 
             if (alunoAtual == null) return;
 
@@ -85,6 +85,7 @@ public class MenuMensalidades
                 Console.Write("Deseja seguir com a inserção da mensalidade? (S/N): ");
                 string resposta = Console.ReadKey().KeyChar.ToString().ToUpper().Trim();
                 Console.ReadLine();
+
                 if (resposta == "S")
                 {
                     // instancio a mensalidade
@@ -94,8 +95,8 @@ public class MenuMensalidades
                         ValorMensalidade = Convert.ToDecimal(valorMensalidade),
                         Status = "pendente"
                     };
-
-                    _mensalidade.LancarMensalidade(novaMensalidade);
+                    // Perguntar pro Sérgio: try catch?
+                    await _mensalidade.LancarMensalidadeAsync(novaMensalidade);
 
                     Console.WriteLine("\nMensalidade lançada com sucesso!");
                     Console.WriteLine("\nPressione Enter para retornar ao menu principal!");
@@ -120,19 +121,19 @@ public class MenuMensalidades
 
         }
     }
-    private void RegistrarPagamentoMensalidade()
+    private async Task RegistrarPagamentoMensalidade()
     {
         while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Registro de Pagamento de Mensalidades ===");
-            Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
+            Aluno alunoAtual = await _menuAlunoAux.CapturarAlunoSelecionado();
 
             if (alunoAtual == null) return;
 
             Console.WriteLine("=== Listagem de Faturas ===");
             Console.WriteLine($"ID: {alunoAtual.Id} | Aluno(a): {alunoAtual.Nome} | CPF: {alunoAtual.Cpf}");
-            List<Mensalidade> faturas = _mensalidade.ListarMensalidades();
+            List<Mensalidade> faturas = await _mensalidade.ListarMensalidadesAsync();
 
             // filtra faturas do aluno atual
             List<Mensalidade> faturasDoAluno = faturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
@@ -175,40 +176,39 @@ public class MenuMensalidades
                     Console.WriteLine("=== Confirmação de Pagamento ===");
                     Console.WriteLine($"\nID do Aluno: {alunoAtual.Id}\nAluno(a): {alunoAtual.Nome}\nValor da Mensalidade: {faturaSelecionada.ValorMensalidade}\nData do pagamento: {dataPagamento.ToShortDateString()}\n Status: {faturaSelecionada.Status}");
                     Console.Write("Por gentileza, confirmar o recebimento? (S/N): ");
+                    // Perguntar pro Sérgio: try catch?
                     if (Console.ReadLine().ToUpper().Trim() == "S")
                     {
-                        bool sucesso = _mensalidade.RegistrarPagamento(idMensalidade, dataPagamento);
-                        if (sucesso)
-                        {
-                            Console.WriteLine("\n=== Pagamento registrado com sucesso! ===");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Hmm.. algo não deu certo. Tente novamente.");
-                        }
+                        await _mensalidade.RegistrarPagamentoAsync(idMensalidade, dataPagamento);
+                        Console.WriteLine("\n=== Pagamento registrado com sucesso! ===");
                     }
                     else
                     {
-                        Console.WriteLine("\nOperação cancelada!");
+                        Console.WriteLine("Hmm.. algo não deu certo. Tente novamente.");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Hmm.. o ID da mensalidade inserido parece incorreto. Tente novamente.");
+                    Console.WriteLine("\nOperação cancelada!");
                 }
-
-                Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu principal.");
-                Console.ReadLine();
-                break;
             }
+            else
+            {
+                Console.WriteLine("Hmm.. o ID da mensalidade inserido parece incorreto. Tente novamente.");
+            }
+
+            Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu principal.");
+            Console.ReadLine();
+            break;
         }
     }
-    private void ListarMensalidades()
+
+    private async Task ListarMensalidades()
     {
         Console.Clear();
         Console.WriteLine("=== Relatório Geral de Mensalidades ===\n");
 
-        List<Mensalidade> faturas = _mensalidade.ListarMensalidades();
+        List<Mensalidade> faturas = await _mensalidade.ListarMensalidadesAsync();
 
         if (faturas.Count == 0)
         {
@@ -222,7 +222,7 @@ public class MenuMensalidades
         Console.WriteLine("--------------------------------------------------------------------------------------");
         foreach (var m in faturas)
         {
-            List<Aluno> buscaAluno = _aluno.Selecionar(m.AlunoId.ToString());
+            List<Aluno> buscaAluno = await _aluno.SelecionarAsync(m.AlunoId.ToString());
             // Variável vazia para depois incluir nela a primeira posição da listagem
             string nomeAluno = "";
 
@@ -237,20 +237,20 @@ public class MenuMensalidades
         Console.WriteLine("\nPor gentileza, pressione Enter para retornar ao menu Principal");
         Console.ReadLine();
     }
-    private void VerificaPendencias()
+    private async Task VerificaPendencias()
     {
         while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Verificação de Pendências ===");
-            Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
+            Aluno alunoAtual = await _menuAlunoAux.CapturarAlunoSelecionado();
 
             if (alunoAtual == null) return;
 
             Console.Clear();
             Console.WriteLine("=== Listagem de Pendências ===");
             Console.WriteLine($"ID: {alunoAtual.Id} | Aluno(a): {alunoAtual.Nome} | CPF: {alunoAtual.Cpf}\n");
-            List<Mensalidade> pendencias = _mensalidade.VerificaPendencias(alunoAtual.Id);
+            List<Mensalidade> pendencias = await _mensalidade.VerificaPendenciasAsync(alunoAtual.Id);
 
             if (pendencias.Count == 0)
             {
@@ -276,19 +276,19 @@ public class MenuMensalidades
             break;
         }
     }
-    private void EditarMensalidade()
+    private async Task EditarMensalidade()
     {
         while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Edição de Mensalidades ===");
-            Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
+            Aluno alunoAtual = await _menuAlunoAux.CapturarAlunoSelecionado();
 
             if (alunoAtual == null) return;
 
             Console.WriteLine($"\n=== Mensalidades de {alunoAtual.Nome} ===");
             // Buscando todas as faturas 
-            List<Mensalidade> todasFaturas = _mensalidade.ListarMensalidades();
+            List<Mensalidade> todasFaturas = await _mensalidade.ListarMensalidadesAsync();
             // já filtrando para buscar apenas o aluno no id inserido (igual excluir)
             List<Mensalidade> faturasDoAluno = todasFaturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
 
@@ -355,7 +355,7 @@ public class MenuMensalidades
             }
 
 
-            bool sucesso = _mensalidade.EditarMensalidade(faturaAtual);
+            bool sucesso = await _mensalidade.EditarMensalidadeAsync(faturaAtual);
 
             if (sucesso)
             {
@@ -367,20 +367,20 @@ public class MenuMensalidades
             break;
         }
     }
-    private void ExcluirMensalidade()
+    private async Task ExcluirMensalidade()
     {
         while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Exclusão de Mensalidades ===\n");
-            Aluno alunoAtual = _menuAlunoAux.CapturarAlunoSelecionado();
+            Aluno alunoAtual = await _menuAlunoAux.CapturarAlunoSelecionado();
 
             if (alunoAtual == null) return;
 
             Console.WriteLine($"=== Mensalidades de {alunoAtual.Nome} ==="); // MELHORIA FEITA! - no futuro, listar todas as mensaliaddes deste aluno antes de excluir, além de uma dupla validação
 
             // aqui a ideia foi buscar do banco todas as mensalidades e criar uma lista nova e ainda vazia apenas para o aluno selecionado           
-            List<Mensalidade> todasFaturas = _mensalidade.ListarMensalidades();
+            List<Mensalidade> todasFaturas = await _mensalidade.ListarMensalidadesAsync();
             // uma lista de mensalidades chamada faturasDoAluno, pegando todas as faturas onde cada fatura tenha o Id do Aluno igual ao Id do alunoAtual e transformando em uma lista
             List<Mensalidade> faturasDoAluno = todasFaturas.Where(f => f.AlunoId == alunoAtual.Id).ToList();
 
@@ -415,10 +415,10 @@ public class MenuMensalidades
                     Console.WriteLine("\nImportante: essa ação não poderá ser desfeita!\n");
                     Console.WriteLine($"\nAluno(a): {alunoAtual.Nome}\nID da Mensalidade: {faturaSelecionada.Id}\nValor: {faturaSelecionada.ValorMensalidade}\nVencimento: {faturaSelecionada.DataVencimento.ToShortDateString()}\nStatus: {faturaSelecionada.Status}");
                     Console.Write($"\nPor gentileza, você deseja seguir com a exclusão da mensalidade {faturaSelecionada.Id}? (S/N): ");
-
+                    // Try Catch?
                     if (Console.ReadLine().ToUpper().Trim() == "S")
                     {
-                        _mensalidade.ExcluirMensalidade(idMensalidade);
+                        await _mensalidade.ExcluirMensalidadeAsync(idMensalidade);
                         Console.WriteLine("\nMensalidade excluída com sucesso!");
                     }
                     else

@@ -12,7 +12,7 @@ public class MenuPrincipal
     }
 
     enum ListaOpcoes { GerenciarAlunos = 1, GerenciarMensalidades, Sair };
-    public void ExibirMenu()
+    public async Task ExibirMenu()
     {
         bool escolheuSair = false;
         while(escolheuSair == false)
@@ -30,13 +30,13 @@ public class MenuPrincipal
                 {
                     case ListaOpcoes.GerenciarAlunos:
                     MenuAluno menuAluno = new MenuAluno(_aluno);
-                    menuAluno.ExibirMenu();
+                    await menuAluno.ExibirMenu();
                     break;
 
                     case ListaOpcoes.GerenciarMensalidades:
                     // aqui vou precisar dos dois, pois busca-se os alunos e se salva as mensalidades
                     MenuMensalidades menuMensalidades = new MenuMensalidades(_aluno, _mensalidade);
-                    menuMensalidades.ExibirMenu();
+                    await menuMensalidades.ExibirMenu();
                     break;
 
                     case ListaOpcoes.Sair:

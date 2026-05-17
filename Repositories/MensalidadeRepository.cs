@@ -13,14 +13,14 @@ public class MensalidadeRepository
     {
         _context = context;
     }
-    // Perguntar pro Sérgio: (mesma da alunorepository) - devo deixar aqui os try/catch ou por no menu? Além disso, seria melhor transformar em um bool como fiz na Registrar?
-    public void LancarMensalidade(Mensalidade novaMensalidade)
+
+    public async Task LancarMensalidadeAsync(Mensalidade novaMensalidade)
     {
         try
         {
             novaMensalidade.DataVencimento = DateTime.Now.AddDays(30);
             _context.Mensalidades.Add(novaMensalidade);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         catch (Exception excecao)
         {
@@ -28,40 +28,44 @@ public class MensalidadeRepository
         }
     }
 
-    // modificação de void para um bool -> true se deu certo, false se deu ruim.
-    public bool RegistrarPagamento(int idMensalidade, DateTime dataPagamento)
+    public async Task RegistrarPagamentoAsync(int idMensalidade, DateTime dataPagamento)
     {
-        var mensalidade = _context.Mensalidades.Find(idMensalidade);
-
-        if (mensalidade != null)
+        try
         {
-            mensalidade.Status = "pago";
-            mensalidade.DataPagamento = dataPagamento;
+            var mensalidade = await _context.Mensalidades.FindAsync(idMensalidade);
 
-            _context.SaveChanges();
-            return true;
+            if (mensalidade != null)
+            {
+                mensalidade.Status = "pago";
+                mensalidade.DataPagamento = dataPagamento;
+
+                await _context.SaveChangesAsync();
+            }
         }
-
-        return false;
+        catch (Exception excecao)
+        {
+            Console.WriteLine($"Falha ao registrar: {excecao}");
+        }
     }
-    public List<Mensalidade> ListarMensalidades()
+    public async Task<List<Mensalidade>> ListarMensalidadesAsync()
     {
-        return _context.Mensalidades.ToList();
+        return await _context.Mensalidades.ToListAsync();
     }
 
-    // a escrita está dessa forma para fins de organização. De fato, seria posto tudo em uma única linha
-    public List<Mensalidade> VerificaPendencias(int alunoId)
+    // a escrita de retorno está dessa forma para fins de organização. De fato, seria posto tudo em uma única linha
+    public async Task<List<Mensalidade>> VerificaPendenciasAsync(int alunoId)
     {
-        return _context.Mensalidades
+        return await _context.Mensalidades
             .Where(m => m.AlunoId == alunoId && m.Status == "pendente")
-            .ToList();
+            .ToListAsync();
     }
-    public bool EditarMensalidade(Mensalidade mensalidadeEditada)
+
+    public async Task<bool> EditarMensalidadeAsync(Mensalidade mensalidadeEditada)
     {
         try
         {
             _context.Mensalidades.Update(mensalidadeEditada);
-            return _context.SaveChanges() > 0; // salvar apenas se for maior que zero
+            return await _context.SaveChangesAsync() > 0; // salvar apenas se for maior que zero
         }
         catch (Exception excecao)
         {
@@ -70,13 +74,20 @@ public class MensalidadeRepository
         }
     }
 
-    public void ExcluirMensalidade(int id)
+    public async Task ExcluirMensalidadeAsync(int id)
     {
-       var mensalidade = _context.Mensalidades.Find(id);
-        if (mensalidade != null)
+        try
         {
-            _context.Mensalidades.Remove(mensalidade);
-            _context.SaveChanges();
+            var mensalidade = await _context.Mensalidades.FindAsync(id);
+            if (mensalidade != null)
+            {
+                _context.Mensalidades.Remove(mensalidade);
+                await _context.SaveChangesAsync();
+            }
+        }
+        catch (Exception excecao)
+        {
+            Console.WriteLine($"Falha ao alterar no banco de dados: {excecao.Message}");
         }
     }
 }

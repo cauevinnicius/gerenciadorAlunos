@@ -1,4 +1,3 @@
-//Importação do pacote MySQL
 using GerenciadorAlunos.Contexts;
 using GerenciadorAlunos.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +16,15 @@ public class AlunoRepository
     }
 
     // Método para efetuar o cadastro. Agora eu posso simplesmente chamar meu molde Aluno e criar um objeto novoAluno (WTF)
-    // Perguntar pro Sérgio: Pensei em por um bool, retornando true após o savechanges e false no catch
-    public void Cadastrar(Aluno novoAluno)
+    // A partir de agora, com os async/await, temos uma Task ao invés de um void, por exemplo.
+    // pelo padrão, os nomes tem a inclusão do "Async"
+    public async Task CadastrarAsync(Aluno novoAluno)
     {
         try
         {
             _context.Alunos.Add(novoAluno); // adição do nosso objeto novoAluno na memória
-            _context.SaveChanges(); // o próprio EF montar o insert sozinho e executa :O
+            // dai no SaveChanges eu incluo um await 
+            await _context.SaveChangesAsync(); // o próprio EF montar o insert sozinho e executa :O
         }
         catch (Exception excecao) //Catch trata exceções apenas. 
         {
@@ -31,34 +32,34 @@ public class AlunoRepository
         }
     }
 
-    // Perguntar pro Sérgio: pesquisando na internet, vi que não seria uma boa prática inserir try/catch em TODOS. Para métodos de leitura (listar, selecionar, verificarpendencias) não faz sentido, mas tão somente para escritas (cadatro, alterar e deletar)
-    public List<Aluno> Listar()
+    // Perguntar pro Sérgio: pesquisando na internet, vi que não seria uma boa prática inserir try/catch em todos. Para métodos de leitura (listar, selecionar, verificarpendencias) não faz sentido, mas tão somente para escritas (cadatro, alterar e deletar)
+    public async Task<List<Aluno>> ListarAsync()
     {
-        return _context.Alunos.ToList(); // literalmente 46 linhas se transformaram em 4.
+        return await _context.Alunos.ToListAsync(); // literalmente 46 linhas se transformaram em 4.
     }
 
-    public List<Aluno> Selecionar(string parametroBusca)
+    public async Task<List<Aluno>> SelecionarAsync(string parametroBusca)
     {
         // só para eu não esquecer: tive a ideia de deixar algo mais dinamico, buscando tanto pelo nome ou pelo ID, por exemplo. Se for digitado um numero, então o usuário digitou um ID. Se não, o usuário digitou um nome.
         if (int.TryParse(parametroBusca, out int idBusca))
         {
-            return _context.Alunos.Where(a => a.Id == idBusca).ToList();
+            return await _context.Alunos.Where(a => a.Id == idBusca).ToListAsync();
         }
         else
         {
             // eu não precisaria necessariamente abrir esse else. Fiz apenas para organizar melhor
-            return _context.Alunos.Where(a => a.Nome.Contains(parametroBusca)).ToList();
+            return await _context.Alunos.Where(a => a.Nome.Contains(parametroBusca)).ToListAsync();
         }
     }
 
     // Método para alterar o cadastro. Agora também só passo o Aluno e o objeto alunoEditado
-   public void Alterar(Aluno alunoEditado)
+   public async Task AlterarAsync(Aluno alunoEditado)
     {
         try
         {
             // O EF busca o aluno, vê o que mudou e faz o UPDATE apenas do necessário
             _context.Alunos.Update(alunoEditado);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         catch (Exception excecao)
         {
@@ -67,13 +68,20 @@ public class AlunoRepository
     }
 
     // Método para deletar o cadastro
-    public void Deletar(int id)
+    public async Task DeletarAsync(int id)
     {
-        var aluno = _context.Alunos.Find(id); // Busca o aluno pelo ID
-        if (aluno != null)
+        try
         {
-            _context.Alunos.Remove(aluno);
-            _context.SaveChanges();
+            var aluno = _context.Alunos.Find(id); // Busca o aluno pelo ID
+            if (aluno != null)
+            {
+                _context.Alunos.Remove(aluno);
+                await _context.SaveChangesAsync();
+            }
+        }
+        catch (Exception excecao)
+        {
+            Console.WriteLine($"Erro ao deletar: {excecao.Message}");
         }
     }
 }

@@ -11,7 +11,7 @@ namespace GerenciadorAlunos;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         // Primeira coisa que preciso fazer agora é ler meu appsetings.json
         var configuration = new ConfigurationBuilder()
@@ -33,7 +33,7 @@ class Program
              // por fim, instancio meu menu principal e incluo os dois repositorios
             MenuPrincipal menu = new MenuPrincipal(alunoRep, mensalidadeRep);
 
-            menu.ExibirMenu();
+            await menu.ExibirMenu();
         }
     }
 }
