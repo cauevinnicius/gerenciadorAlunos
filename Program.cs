@@ -1,39 +1,69 @@
-﻿using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
-using GerenciadorAlunos.Contexts;
-using GerenciadorAlunos.Repositories;
-using GerenciadorAlunos.UI;
+using Microsoft.AspNetCore.Identity;
+using GerenciadorAlunosV2.Contexts;
+using GerenciadorAlunosV2.Repositories;
 
-namespace GerenciadorAlunos;
+var builder = WebApplication.CreateBuilder(args);
 
+// adição da configuração da connection, meu dbcontext e o mysql
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<GerenciadorAlunosDbContext>(options => options.UseMySQL(connectionString));
 
-class Program
+// agora com o Identity, tenho que builder os seus servicos. Faço de usuário padrão e perfis.
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => 
 {
-    static async Task Main(string[] args)
-    {
-        // Primeira coisa que preciso fazer agora é ler meu appsetings.json
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .Build();
-        string connectionString = configuration.GetConnectionString("DefaultConnection");
+    // aproveitei pra já passar uns parâmetros
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+})
+    .AddEntityFrameworkStores<GerenciadorAlunosDbContext>()
+    .AddDefaultTokenProviders(); 
 
-        // depois preciso configurar o pacote de configurações do EF
-        var optionsBuilder = new DbContextOptionsBuilder<GerenciadorAlunosDbContext>();
-        optionsBuilder.UseMySQL(connectionString);
+// daí agora preciso do cookie de autenticação
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // se um usuário não logado tentar acessar uma página bloqueada, volta pro login
+    options.LoginPath = "/Conta/Login";
+    // se um usuário tentar acessar uma página q não tem privilégios suficientes, é direcionado p acesso negado
+    options.AccessDeniedPath = "/Conta/AcessoNegado";
+    
+});
 
-       using (var context = new GerenciadorAlunosDbContext(optionsBuilder.Options))
-        {
-            // faço a instancia dos novos repositórios e incluo o context
-            AlunoRepository alunoRep = new AlunoRepository(context);
-            MensalidadeRepository mensalidadeRep = new MensalidadeRepository(context);
+// preciso registrar meus repositorios na injeção de dependência do aspnet
+// o addscoped cria uma instância do repositório por requisição web
+builder.Services.AddScoped<AlunoRepository>();
+builder.Services.AddScoped<MensalidadeRepository>();
 
-             // por fim, instancio meu menu principal e incluo os dois repositorios
-            MenuPrincipal menu = new MenuPrincipal(alunoRep, mensalidadeRep);
+// preciso incluir os servicos do padrão mvc, q seriam minhas controllers e minhas views
+builder.Services.AddControllersWithViews();
 
-            await menu.ExibirMenu();
-        }
-    }
+var app = builder.Build();
+
+// configuração de ambiente - já veio automaticamente com a criação do projeto
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapStaticAssets();
+
+// definição da minha rota padrão
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
+
+app.Run();

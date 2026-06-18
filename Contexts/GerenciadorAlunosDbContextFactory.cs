@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace GerenciadorAlunos.Contexts;
+namespace GerenciadorAlunosV2.Contexts;
 // Basicamente, aqui seria a minha nova classe de conexão. Agora será "Factory"
-// Classe responsavel pela criacao do contexto de banco de dados em tempo de design
+// Classe responsavel pela criacao do contexto de banco de dados 
 public class GerenciadorAlunosDbContextFactory : IDesignTimeDbContextFactory<GerenciadorAlunosDbContext>
 {
     public GerenciadorAlunosDbContext CreateDbContext(string[] args)
